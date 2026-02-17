@@ -32,11 +32,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const register = (name: string, email: string) => {
-        const newUser = { name, email };
-        setUser(newUser);
+        // Just mark as registered, don't log in automatically
         setIsRegistered(true);
         localStorage.setItem("emart_registered", "true");
-        localStorage.setItem("emart_user", JSON.stringify(newUser));
     };
 
     const login = (email: string) => {

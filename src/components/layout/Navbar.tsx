@@ -33,24 +33,24 @@ const Navbar = () => {
                         </button>
                     </div>
 
-                    {/* Desktop Navigation & Search */}
-                    <div className="hidden md:flex flex-1 items-center justify-center px-8">
-                        <div className={`relative transition-all duration-300 ${isSearchFocused ? 'w-full max-w-xl' : 'w-full max-w-sm'}`}>
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <Search className="h-4 w-4 text-gray-400" />
+                    {/* Navigation & Search (Visible on Mobile & Desktop) */}
+                    <div className="flex-1 flex items-center justify-center px-2 md:px-8">
+                        <div className={`relative transition-all duration-300 ${isSearchFocused ? 'w-full max-w-sm md:max-w-xl' : 'w-full max-w-[120px] sm:max-w-xs md:max-w-sm'}`}>
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search className="h-3.5 w-3.5 text-gray-400" />
                             </div>
                             <input
                                 type="text"
-                                placeholder="Search for products, brands and more..."
-                                className="block w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-full bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+                                placeholder="Search..."
+                                className="block w-full pl-9 pr-3 py-1.5 border border-gray-200 rounded-full bg-gray-50 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
                                 onFocus={() => setIsSearchFocused(true)}
                                 onBlur={() => setIsSearchFocused(false)}
                             />
                         </div>
                     </div>
 
-                    {/* User Actions */}
-                    <div className="hidden md:flex items-center space-x-6">
+                    {/* User Actions & Auth (Visible on Mobile & Desktop) */}
+                    <div className="flex items-center space-x-1.5 md:space-x-6">
                         <AnimatePresence mode="wait">
                             {!user ? (
                                 <motion.div
@@ -58,25 +58,25 @@ const Navbar = () => {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="flex items-center space-x-3"
+                                    className="flex items-center space-x-1 md:space-x-3"
                                 >
                                     {!isRegistered && (
                                         <>
-                                            <Link href="/login" className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors">
+                                            <Link href="/login" className="text-[11px] md:text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors px-1">
                                                 Login
                                             </Link>
                                             <Link
                                                 href="/register"
-                                                className="flex items-center gap-1 text-sm font-semibold px-5 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all font-sans"
+                                                className="flex items-center gap-1 text-[10px] md:text-sm font-bold px-2.5 md:px-5 py-1.5 md:py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all font-sans whitespace-nowrap"
                                             >
-                                                <UserPlus className="w-4 h-4" /> Register
+                                                Register
                                             </Link>
                                         </>
                                     )}
                                     {isRegistered && (
                                         <Link
                                             href="/login"
-                                            className="flex items-center gap-1 text-sm font-semibold px-5 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
+                                            className="flex items-center gap-1 text-xs md:text-sm font-semibold px-4 md:px-5 py-1.5 md:py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
                                         >
                                             <LogIn className="w-4 h-4" /> Login
                                         </Link>
@@ -91,99 +91,28 @@ const Navbar = () => {
                                     className="flex items-center space-x-4"
                                 >
                                     <Link href="/profile" className="flex items-center gap-2 group p-1 pr-3 rounded-full hover:bg-gray-50 transition-colors">
-                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
-                                            <User className="w-4 h-4" />
+                                        <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+                                            <User className="w-3.5 h-3.5 md:w-4 h-4" />
                                         </div>
-                                        <div className="text-left">
+                                        <div className="hidden lg:block text-left">
                                             <p className="text-[10px] text-gray-400 font-medium leading-none mb-0.5">Welcome</p>
                                             <p className="text-sm font-semibold text-gray-700 leading-none">{user.name.split(' ')[0]}</p>
                                         </div>
                                     </Link>
-                                    <button onClick={logout} className="text-sm text-gray-500 hover:text-red-500 font-medium">Logout</button>
+                                    <button onClick={logout} className="text-xs md:text-sm text-gray-500 hover:text-red-500 font-bold px-2 py-1">Logout</button>
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
-                        <Link href="/cart" className="relative p-2 text-gray-700 hover:text-blue-600 transition-colors group">
+                        <Link href="/cart" className="hidden md:flex relative p-2 text-gray-700 hover:text-blue-600 transition-colors group">
                             <ShoppingCart className="w-6 h-6" />
                             <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-extrabold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-blue-600 rounded-full group-hover:scale-110 transition-transform font-sans">
                                 0
                             </span>
                         </Link>
                     </div>
-
-                    {/* Mobile menu button */}
-                    <div className="md:hidden flex items-center gap-4">
-                        <Link href="/cart" className="relative p-2 text-gray-700">
-                            <ShoppingCart className="w-6 h-6" />
-                        </Link>
-                        <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="text-gray-700 hover:text-blue-600 focus:outline-none"
-                        >
-                            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                        </button>
-                    </div>
                 </div>
             </div>
-
-            {/* Mobile Menu */}
-            <AnimatePresence>
-                {isMenuOpen && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="md:hidden bg-white border-t border-gray-100 overflow-hidden"
-                    >
-                        <div className="px-4 pt-4 pb-8 space-y-6">
-                            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl">
-                                <MapPin className="w-5 h-5 text-blue-600" />
-                                <div>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Deliver to</p>
-                                    <p className="text-sm font-semibold text-gray-900">{location}</p>
-                                </div>
-                            </div>
-
-                            <div className="relative">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search products..."
-                                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/20"
-                                />
-                            </div>
-
-                            <div className="flex flex-col gap-4">
-                                {!user ? (
-                                    <>
-                                        {!isRegistered && (
-                                            <Link
-                                                href="/register"
-                                                onClick={() => setIsMenuOpen(false)}
-                                                className="flex justify-center items-center gap-2 py-3 text-sm font-bold bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-200"
-                                            >
-                                                <UserPlus className="w-4 h-4" /> Register
-                                            </Link>
-                                        )}
-                                        <Link
-                                            href="/login"
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className="flex justify-center items-center gap-2 py-3 text-sm font-bold text-gray-700 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors"
-                                        >
-                                            <LogIn className="w-4 h-4" /> Login
-                                        </Link>
-                                    </>
-                                ) : (
-                                    <button onClick={() => { logout(); setIsMenuOpen(false); }} className="flex justify-center items-center gap-2 py-3 text-sm font-bold text-red-600 bg-red-50 rounded-2xl">
-                                        Logout
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </nav>
     );
 };
