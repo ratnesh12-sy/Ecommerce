@@ -30,7 +30,7 @@ const LoginPage = () => {
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 mb-4">
                         <LogIn className="w-8 h-8" />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">Welcome</h1>
                     <p className="text-gray-500 mt-2">Log in to your e-mart account</p>
                 </div>
 
@@ -69,7 +69,7 @@ const LoginPage = () => {
                         type="submit"
                         className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2 group"
                     >
-                        Sign In <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        login In <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                 </form>
 
