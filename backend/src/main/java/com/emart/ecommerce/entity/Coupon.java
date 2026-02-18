@@ -1,17 +1,11 @@
 package com.emart.ecommerce.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "coupons")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Coupon {
 
     @Id
@@ -29,4 +23,55 @@ public class Coupon {
 
     @Column(nullable = false)
     private Boolean isActive = true;
+
+    public Coupon() {
+    }
+
+    public Coupon(Long id, String code, Integer discountPercent, LocalDateTime expiryDate, Boolean isActive) {
+        this.id = id;
+        this.code = code;
+        this.discountPercent = discountPercent;
+        this.expiryDate = expiryDate;
+        this.isActive = isActive;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public Integer getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public void setDiscountPercent(Integer discountPercent) {
+        this.discountPercent = discountPercent;
+    }
+
+    public LocalDateTime getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDateTime expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
 }

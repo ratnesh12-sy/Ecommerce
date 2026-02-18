@@ -2,15 +2,19 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Search, ShoppingCart, User, LogIn, UserPlus, Menu, X, MapPin } from "lucide-react";
+import { Search, ShoppingCart, User, LogIn, MapPin } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
     const { user, isRegistered, logout } = useAuth();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [location] = useState("New York, USA");
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
 
     return (
         <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-lg">
@@ -51,58 +55,60 @@ const Navbar = () => {
 
                     {/* User Actions & Auth (Visible on Mobile & Desktop) */}
                     <div className="flex items-center space-x-1.5 md:space-x-6">
-                        <AnimatePresence mode="wait">
-                            {!user ? (
-                                <motion.div
-                                    key="guest-actions"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="flex items-center space-x-1 md:space-x-3"
-                                >
-                                    {!isRegistered && (
-                                        <>
-                                            <Link href="/login" className="text-[11px] md:text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors px-1">
-                                                Login
-                                            </Link>
+                        {mounted && (
+                            <AnimatePresence mode="wait">
+                                {!user ? (
+                                    <motion.div
+                                        key="guest-actions"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="flex items-center space-x-1 md:space-x-3"
+                                    >
+                                        {!isRegistered && (
+                                            <>
+                                                <Link href="/login" className="text-[11px] md:text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors px-1">
+                                                    Login
+                                                </Link>
+                                                <Link
+                                                    href="/register"
+                                                    className="flex items-center gap-1 text-[10px] md:text-sm font-bold px-2.5 md:px-5 py-1.5 md:py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all font-sans whitespace-nowrap"
+                                                >
+                                                    Register
+                                                </Link>
+                                            </>
+                                        )}
+                                        {isRegistered && (
                                             <Link
-                                                href="/register"
-                                                className="flex items-center gap-1 text-[10px] md:text-sm font-bold px-2.5 md:px-5 py-1.5 md:py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all font-sans whitespace-nowrap"
+                                                href="/login"
+                                                className="flex items-center gap-1 text-xs md:text-sm font-semibold px-4 md:px-5 py-1.5 md:py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
                                             >
-                                                Register
+                                                <LogIn className="w-4 h-4" /> Login
                                             </Link>
-                                        </>
-                                    )}
-                                    {isRegistered && (
-                                        <Link
-                                            href="/login"
-                                            className="flex items-center gap-1 text-xs md:text-sm font-semibold px-4 md:px-5 py-1.5 md:py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
-                                        >
-                                            <LogIn className="w-4 h-4" /> Login
+                                        )}
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="user-actions"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="flex items-center space-x-4"
+                                    >
+                                        <Link href="/profile" className="flex items-center gap-2 group p-1 pr-3 rounded-full hover:bg-gray-50 transition-colors">
+                                            <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+                                                <User className="w-3.5 h-3.5 md:w-4 h-4" />
+                                            </div>
+                                            <div className="hidden lg:block text-left">
+                                                <p className="text-[10px] text-gray-400 font-medium leading-none mb-0.5">Welcome</p>
+                                                <p className="text-sm font-semibold text-gray-700 leading-none">{user.name.split(' ')[0]}</p>
+                                            </div>
                                         </Link>
-                                    )}
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    key="user-actions"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="flex items-center space-x-4"
-                                >
-                                    <Link href="/profile" className="flex items-center gap-2 group p-1 pr-3 rounded-full hover:bg-gray-50 transition-colors">
-                                        <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
-                                            <User className="w-3.5 h-3.5 md:w-4 h-4" />
-                                        </div>
-                                        <div className="hidden lg:block text-left">
-                                            <p className="text-[10px] text-gray-400 font-medium leading-none mb-0.5">Welcome</p>
-                                            <p className="text-sm font-semibold text-gray-700 leading-none">{user.name.split(' ')[0]}</p>
-                                        </div>
-                                    </Link>
-                                    <button onClick={logout} className="text-xs md:text-sm text-gray-500 hover:text-red-500 font-bold px-2 py-1">Logout</button>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                        <button onClick={logout} className="text-xs md:text-sm text-gray-500 hover:text-red-500 font-bold px-2 py-1">Logout</button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        )}
 
                         <Link href="/cart" className="hidden md:flex relative p-2 text-gray-700 hover:text-blue-600 transition-colors group">
                             <ShoppingCart className="w-6 h-6" />

@@ -22,7 +22,7 @@ const RegisterPage = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        register(name, email);
+        register();
         router.push("/login");
     };
 

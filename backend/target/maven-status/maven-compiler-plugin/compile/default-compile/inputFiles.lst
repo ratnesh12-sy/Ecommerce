@@ -27,6 +27,7 @@ C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\backend\src\main\java\com\ema
 C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\backend\src\main\java\com\emart\ecommerce\security\CustomUserDetailsService.java
 C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\backend\src\main\java\com\emart\ecommerce\security\JwtAuthenticationEntryPoint.java
 C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\backend\src\main\java\com\emart\ecommerce\security\JwtAuthenticationFilter.java
+C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\backend\src\main\java\com\emart\ecommerce\security\JwtProperties.java
 C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\backend\src\main\java\com\emart\ecommerce\security\JwtTokenProvider.java
 C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\backend\src\main\java\com\emart\ecommerce\service\AuthService.java
 C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\backend\src\main\java\com\emart\ecommerce\service\AuthServiceImpl.java
