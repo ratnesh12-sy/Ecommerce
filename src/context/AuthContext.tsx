@@ -10,7 +10,7 @@ interface User {
 interface AuthContextType {
     user: User | null;
     isRegistered: boolean;
-    register: (name: string, email: string) => void;
+    register: () => void;
     login: (email: string) => void;
     logout: () => void;
 }
@@ -21,17 +21,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<User | null>(null);
     const [isRegistered, setIsRegistered] = useState(false);
 
-    // Persistence for simulation
     useEffect(() => {
-        const savedRegistration = localStorage.getItem("emart_registered") === "true";
         const savedUser = localStorage.getItem("emart_user");
-        setIsRegistered(savedRegistration);
         if (savedUser) {
             setUser(JSON.parse(savedUser));
         }
+        setIsRegistered(localStorage.getItem("emart_registered") === "true");
     }, []);
 
-    const register = (name: string, email: string) => {
+    const register = () => {
         // Just mark as registered, don't log in automatically
         setIsRegistered(true);
         localStorage.setItem("emart_registered", "true");

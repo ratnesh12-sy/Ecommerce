@@ -1,7 +1,6 @@
 package com.emart.ecommerce.service;
 
 import com.emart.ecommerce.entity.CartItem;
-import com.emart.ecommerce.entity.User;
 import java.util.List;
 
 public interface CartService {

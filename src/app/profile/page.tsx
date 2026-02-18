@@ -121,7 +121,7 @@ const ProfilePage = () => {
                                 <Star className="w-32 h-32 text-white" />
                             </div>
                             <p className="text-indigo-100 font-bold text-xs uppercase tracking-[0.2em] mb-2 font-sans">Loyalty Program</p>
-                            <h2 className="text-2xl font-black leading-tight mb-4">You're close to <br />Platinum!</h2>
+                            <h2 className="text-2xl font-black leading-tight mb-4">You&apos;re close to <br />Platinum!</h2>
                             <button className="w-full py-3 bg-white text-indigo-700 font-black rounded-xl text-sm shadow-lg hover:scale-[1.02] transition-transform">
                                 View Perks
                             </button>

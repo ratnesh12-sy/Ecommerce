@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { ShoppingBag, ArrowLeft, Trash2, Plus, Minus, CreditCard, ShieldCheck, Truck } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, Trash2, Plus, Minus, CreditCard, ShieldCheck, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 
 const CartPage = () => {
@@ -51,8 +52,8 @@ const CartPage = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-6"
                                 >
-                                    <div className="w-24 h-24 rounded-2xl bg-gray-100 overflow-hidden flex-shrink-0">
-                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                    <div className="relative w-24 h-24 rounded-2xl bg-gray-100 overflow-hidden flex-shrink-0">
+                                        <Image src={item.image} alt={item.name} fill className="object-cover" unoptimized />
                                     </div>
 
                                     <div className="flex-1">

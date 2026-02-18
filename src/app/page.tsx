@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic";
 import StructuredData, { emartOrganizationSchema, emartWebsiteSchema } from "@/components/seo/StructuredData";
 
 // Future sections will be added here following the same pattern
