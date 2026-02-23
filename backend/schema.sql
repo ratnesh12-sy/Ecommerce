@@ -1,93 +1,96 @@
--- Create Database
+-- E-mart Database Schema
 CREATE DATABASE IF NOT EXISTS emart_db;
 USE emart_db;
 
--- Users Table (Enhanced)
-CREATE TABLE users (
+-- Users Table (supports both email+password and phone OTP auth)
+CREATE TABLE IF NOT EXISTS users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    membership_level VARCHAR(50) DEFAULT 'Gold Member',
+    name VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
+    password VARCHAR(255),
+    mobile_number VARCHAR(20) UNIQUE,
+    membership_level VARCHAR(20) DEFAULT 'REGULAR',
     loyalty_points INT DEFAULT 0,
-    wallet_balance DECIMAL(19, 2) DEFAULT 0.00,
-    profile_image VARCHAR(255)
+    wallet_balance DOUBLE DEFAULT 0.0,
+    profile_image VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- User Roles
-CREATE TABLE user_roles (
+-- User roles
+CREATE TABLE IF NOT EXISTS user_roles (
     user_id BIGINT NOT NULL,
-    role VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    role VARCHAR(50) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Products Table
-CREATE TABLE products (
+-- Products
+CREATE TABLE IF NOT EXISTS products (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    price DECIMAL(19, 2) NOT NULL,
+    price DOUBLE NOT NULL,
+    stock INT DEFAULT 0,
     image_url VARCHAR(255),
-    category VARCHAR(255),
-    stock_quantity INT NOT NULL
+    category VARCHAR(50)
 );
 
--- Orders Table
-CREATE TABLE orders (
+-- Orders
+CREATE TABLE IF NOT EXISTS orders (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    order_date DATETIME NOT NULL,
-    total_amount DECIMAL(19, 2) NOT NULL,
-    status VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    total_amount DOUBLE NOT NULL,
+    status VARCHAR(20) DEFAULT 'PENDING',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Order Items Table
-CREATE TABLE order_items (
+-- Order Items
+CREATE TABLE IF NOT EXISTS order_items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
     quantity INT NOT NULL,
-    price DECIMAL(19, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id),
+    price DOUBLE NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
--- Cart Items Table
-CREATE TABLE cart_items (
+-- Cart Items
+CREATE TABLE IF NOT EXISTS cart_items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
     quantity INT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
 -- Wishlist Items
-CREATE TABLE wishlist_items (
+CREATE TABLE IF NOT EXISTS wishlist_items (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
 -- Wallet Transactions
-CREATE TABLE wallet_transactions (
+CREATE TABLE IF NOT EXISTS wallet_transactions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    type VARCHAR(50) NOT NULL, -- RECEIVED, SPEND, TOPUP
-    title VARCHAR(255) NOT NULL,
-    date DATETIME NOT NULL,
-    amount DECIMAL(19, 2) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    amount DOUBLE NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    description VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Coupons
-CREATE TABLE coupons (
+CREATE TABLE IF NOT EXISTS coupons (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
-    discount_percent INT NOT NULL,
-    expiry_date DATETIME NOT NULL,
+    discount_percent DOUBLE NOT NULL,
+    min_order_value DOUBLE DEFAULT 0,
+    expiry_date DATETIME,
     is_active BOOLEAN DEFAULT TRUE
 );

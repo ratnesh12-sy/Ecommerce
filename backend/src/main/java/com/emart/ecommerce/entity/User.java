@@ -1,6 +1,8 @@
 package com.emart.ecommerce.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -11,46 +13,42 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String membershipLevel = "Gold Member";
+    @Column(name = "mobile_number", unique = true)
+    private String mobileNumber;
 
-    @Column(nullable = false)
+    @Column(name = "membership_level")
+    private String membershipLevel = "REGULAR";
+
+    @Column(name = "loyalty_points")
     private Integer loyaltyPoints = 0;
 
-    @Column(nullable = false)
-    private java.math.BigDecimal walletBalance = java.math.BigDecimal.ZERO;
+    @Column(name = "wallet_balance")
+    private Double walletBalance = 0.0;
 
+    @Column(name = "profile_image")
     private String profileImage;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
-    private Set<String> roles;
+    private Set<String> roles = new HashSet<>();
 
-    public User() {
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 
-    public User(Long id, String name, String email, String password, String membershipLevel, Integer loyaltyPoints,
-            java.math.BigDecimal walletBalance, String profileImage, Set<String> roles) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.membershipLevel = membershipLevel;
-        this.loyaltyPoints = loyaltyPoints;
-        this.walletBalance = walletBalance;
-        this.profileImage = profileImage;
-        this.roles = roles;
-    }
+    // ─── Getters & Setters ───
 
     public Long getId() {
         return id;
@@ -84,6 +82,14 @@ public class User {
         this.password = password;
     }
 
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
+    }
+
     public String getMembershipLevel() {
         return membershipLevel;
     }
@@ -100,11 +106,11 @@ public class User {
         this.loyaltyPoints = loyaltyPoints;
     }
 
-    public java.math.BigDecimal getWalletBalance() {
+    public Double getWalletBalance() {
         return walletBalance;
     }
 
-    public void setWalletBalance(java.math.BigDecimal walletBalance) {
+    public void setWalletBalance(Double walletBalance) {
         this.walletBalance = walletBalance;
     }
 
@@ -122,5 +128,13 @@ public class User {
 
     public void setRoles(Set<String> roles) {
         this.roles = roles;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

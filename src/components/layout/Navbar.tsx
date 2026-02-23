@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
-    const { user, isRegistered, logout } = useAuth();
+    const { user, logout } = useAuth();
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [location] = useState("New York, USA");
     const [mounted, setMounted] = React.useState(false);
@@ -65,27 +65,15 @@ const Navbar = () => {
                                         exit={{ opacity: 0 }}
                                         className="flex items-center space-x-1 md:space-x-3"
                                     >
-                                        {!isRegistered && (
-                                            <>
-                                                <Link href="/login" className="text-[11px] md:text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors px-1">
-                                                    Login
-                                                </Link>
-                                                <Link
-                                                    href="/register"
-                                                    className="flex items-center gap-1 text-[10px] md:text-sm font-bold px-2.5 md:px-5 py-1.5 md:py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all font-sans whitespace-nowrap"
-                                                >
-                                                    Register
-                                                </Link>
-                                            </>
-                                        )}
-                                        {isRegistered && (
-                                            <Link
-                                                href="/login"
-                                                className="flex items-center gap-1 text-xs md:text-sm font-semibold px-4 md:px-5 py-1.5 md:py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
-                                            >
-                                                <LogIn className="w-4 h-4" /> Login
-                                            </Link>
-                                        )}
+                                        <Link href="/login" className="text-[11px] md:text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors px-1">
+                                            Login
+                                        </Link>
+                                        <Link
+                                            href="/register"
+                                            className="flex items-center gap-1 text-[10px] md:text-sm font-bold px-2.5 md:px-5 py-1.5 md:py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all font-sans whitespace-nowrap"
+                                        >
+                                            Register
+                                        </Link>
                                     </motion.div>
                                 ) : (
                                     <motion.div
