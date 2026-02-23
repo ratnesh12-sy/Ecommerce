@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const Navbar = () => {
     const { user, logout } = useAuth();
     const [isSearchFocused, setIsSearchFocused] = useState(false);
-    const [location] = useState("New York, USA");
+    const [location] = useState("Mumbai, India");
     const [mounted, setMounted] = React.useState(false);
 
     React.useEffect(() => {
@@ -85,7 +85,7 @@ const Navbar = () => {
                                     >
                                         <Link href="/profile" className="flex items-center gap-2 group p-1 pr-3 rounded-full hover:bg-gray-50 transition-colors">
                                             <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
-                                                <User className="w-3.5 h-3.5 md:w-4 h-4" />
+                                                <User className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                             </div>
                                             <div className="hidden lg:block text-left">
                                                 <p className="text-[10px] text-gray-400 font-medium leading-none mb-0.5">Welcome</p>

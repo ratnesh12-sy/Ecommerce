@@ -21,7 +21,7 @@ const MobileBottomNav = () => {
         { label: "Profile", icon: User, href: "/profile" },
         { label: "Wallet", icon: Wallet, href: "/wallet" },
         { label: "Cart", icon: ShoppingCart, href: "/cart" },
-        { label: "Menu", icon: Menu, href: "#menu" }, // Menu can trigger a drawer or overlay
+        { label: "Menu", icon: Menu, href: "/menu" },
     ];
 
     return (

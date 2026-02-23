@@ -7,15 +7,54 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #111827;
-  /* Gray-900 */
+  --foreground: #0f172a;
   --primary: #2563eb;
+  --primary-dark: #1d4ed8;
   --primary-foreground: #ffffff;
   --accent: #f59e0b;
+  --accent-foreground: #78350f;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --radius: 1rem;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--foreground);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mobile bottom nav clearance */
+@media (max-width: 767px) {
+  footer {
+    padding-bottom: 6rem;
+  }
 }

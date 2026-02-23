@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { loginAPI, registerAPI, firebaseLoginAPI } from "@/lib/api";
+import { loginAPI, registerAPI, firebaseLoginAPI, getUserProfile } from "@/lib/api";
 
 interface User {
     name: string;
@@ -43,6 +43,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const clearError = useCallback(() => setError(null), []);
 
+    /** Helper: fetch real profile from backend and save it */
+    const fetchAndStoreProfile = useCallback(async (fallbackName: string, fallbackEmail?: string, fallbackPhone?: string) => {
+        try {
+            const profile = await getUserProfile();
+            const newUser: User = {
+                name: profile.name || fallbackName,
+                email: profile.email || fallbackEmail,
+                phone: profile.mobileNumber || fallbackPhone,
+            };
+            setUser(newUser);
+            localStorage.setItem("emart_user", JSON.stringify(newUser));
+        } catch {
+            // If profile fetch fails, use fallback values
+            const newUser: User = { name: fallbackName, email: fallbackEmail, phone: fallbackPhone };
+            setUser(newUser);
+            localStorage.setItem("emart_user", JSON.stringify(newUser));
+        }
+    }, []);
+
     // ─── Email + Password Login ───
     const login = useCallback(async (email: string, password: string) => {
         setLoading(true);
@@ -51,9 +70,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const response = await loginAPI(email, password);
             localStorage.setItem("emart_token", response.accessToken);
 
-            const newUser: User = { name: email.split("@")[0], email };
-            setUser(newUser);
-            localStorage.setItem("emart_user", JSON.stringify(newUser));
+            // Fetch real profile from backend to get actual name
+            await fetchAndStoreProfile(email.split("@")[0], email);
         } catch (err) {
             const message = err instanceof Error ? err.message : "Login failed. Please try again.";
             setError(message);
@@ -61,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [fetchAndStoreProfile]);
 
     // ─── Email + Password Register ───
     const register = useCallback(async (name: string, email: string, password: string) => {
@@ -86,9 +104,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const response = await firebaseLoginAPI(idToken);
             localStorage.setItem("emart_token", response.accessToken);
 
-            const newUser: User = { name: phone, phone };
-            setUser(newUser);
-            localStorage.setItem("emart_user", JSON.stringify(newUser));
+            // Fetch real profile from backend to get actual name
+            await fetchAndStoreProfile(phone, undefined, phone);
         } catch (err) {
             const message = err instanceof Error ? err.message : "Login failed. Please try again.";
             setError(message);
@@ -96,7 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [fetchAndStoreProfile]);
 
     const updateUser = useCallback((updatedUser: User) => {
         setUser(updatedUser);
