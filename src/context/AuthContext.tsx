@@ -18,6 +18,7 @@ interface AuthContextType {
     loginWithPhone: (idToken: string, phone: string) => Promise<void>;
     logout: () => void;
     clearError: () => void;
+    updateUser: (updatedUser: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -97,6 +98,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
+    const updateUser = useCallback((updatedUser: User) => {
+        setUser(updatedUser);
+        localStorage.setItem("emart_user", JSON.stringify(updatedUser));
+    }, []);
+
     const logout = useCallback(() => {
         setUser(null);
         setError(null);
@@ -105,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, loading, error, login, register, loginWithPhone, logout, clearError }}>
+        <AuthContext.Provider value={{ user, loading, error, login, register, loginWithPhone, logout, clearError, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

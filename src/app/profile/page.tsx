@@ -2,16 +2,69 @@
 
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { User, Mail, Phone, Shield, Package, Settings, LogOut, Star, Heart, ChevronRight, Edit3 } from "lucide-react";
+import { updateUserProfile } from "@/lib/api";
+import { User, Mail, Phone, Shield, Package, Settings, LogOut, Star, Heart, ChevronRight, Edit3, Save, X, Loader2, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
 type SectionKey = "account" | "orders" | "wishlist" | "security";
 
 const ProfilePage = () => {
-    const { user, logout } = useAuth();
+    const { user, logout, updateUser } = useAuth();
     const [activeSection, setActiveSection] = useState<SectionKey>("account");
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+    // ─── Edit Mode State ───
+    const [isEditing, setIsEditing] = useState(false);
+    const [editName, setEditName] = useState("");
+    const [editEmail, setEditEmail] = useState("");
+    const [editPhone, setEditPhone] = useState("");
+    const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const [saveSuccess, setSaveSuccess] = useState(false);
+
+    const startEditing = () => {
+        setEditName(user?.name || "");
+        setEditEmail(user?.email || "");
+        setEditPhone(user?.phone || "");
+        setSaveError(null);
+        setSaveSuccess(false);
+        setIsEditing(true);
+    };
+
+    const cancelEditing = () => {
+        setIsEditing(false);
+        setSaveError(null);
+        setSaveSuccess(false);
+    };
+
+    const handleSave = async () => {
+        setSaving(true);
+        setSaveError(null);
+        setSaveSuccess(false);
+        try {
+            const updated = await updateUserProfile({
+                name: editName || undefined,
+                email: editEmail || undefined,
+                mobileNumber: editPhone || undefined,
+            });
+            // Sync to AuthContext + localStorage
+            updateUser({
+                name: updated.name,
+                email: updated.email || undefined,
+                phone: updated.mobileNumber || undefined,
+            });
+            setSaveSuccess(true);
+            setTimeout(() => {
+                setIsEditing(false);
+                setSaveSuccess(false);
+            }, 1200);
+        } catch (err) {
+            setSaveError(err instanceof Error ? err.message : "Failed to update profile.");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     if (!user) {
         return (
@@ -114,7 +167,7 @@ const ProfilePage = () => {
                                 </button>
                             </div>
 
-                            {/* Loyalty Card (Moved to Sidebar) */}
+                            {/* Loyalty Card */}
                             <div className="mt-5 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-5 text-white relative overflow-hidden group shadow-lg shadow-indigo-100">
                                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:scale-110 transition-transform duration-500">
                                     <Star className="w-20 h-20 text-white" />
@@ -147,39 +200,125 @@ const ProfilePage = () => {
                                                 <h2 className="text-xl font-bold text-gray-900">Personal Information</h2>
                                                 <p className="text-sm text-gray-400 mt-1">Manage your identity and contact details.</p>
                                             </div>
-                                            <button className="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-100 transition-all">
-                                                <Edit3 className="w-4 h-4" /> Edit Profile
-                                            </button>
+                                            {!isEditing ? (
+                                                <button
+                                                    onClick={startEditing}
+                                                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-100 transition-all"
+                                                >
+                                                    <Edit3 className="w-4 h-4" /> Edit Profile
+                                                </button>
+                                            ) : (
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        onClick={cancelEditing}
+                                                        disabled={saving}
+                                                        className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all disabled:opacity-50"
+                                                    >
+                                                        <X className="w-4 h-4" /> Cancel
+                                                    </button>
+                                                    <button
+                                                        onClick={handleSave}
+                                                        disabled={saving}
+                                                        className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all disabled:opacity-70 shadow-md shadow-blue-200"
+                                                    >
+                                                        {saving ? (
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                        ) : saveSuccess ? (
+                                                            <Check className="w-4 h-4" />
+                                                        ) : (
+                                                            <Save className="w-4 h-4" />
+                                                        )}
+                                                        {saving ? "Saving..." : saveSuccess ? "Saved!" : "Save"}
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
 
+                                        {/* Error / Success Toasts */}
+                                        <AnimatePresence>
+                                            {saveError && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: "auto" }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium"
+                                                >
+                                                    {saveError}
+                                                </motion.div>
+                                            )}
+                                            {saveSuccess && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: "auto" }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm font-medium flex items-center gap-2"
+                                                >
+                                                    <Check className="w-4 h-4" /> Profile updated successfully!
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+
                                         <div className="grid grid-cols-1 gap-6">
+                                            {/* Full Name */}
                                             <div className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
                                                 <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
                                                     <User className="w-5 h-5 text-blue-600" />
                                                 </div>
                                                 <div className="flex-1">
                                                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Full Name</label>
-                                                    <p className="text-sm font-bold text-gray-800">{user.name}</p>
+                                                    {isEditing ? (
+                                                        <input
+                                                            type="text"
+                                                            value={editName}
+                                                            onChange={(e) => setEditName(e.target.value)}
+                                                            className="w-full text-sm font-bold text-gray-800 bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                            placeholder="Enter your name"
+                                                        />
+                                                    ) : (
+                                                        <p className="text-sm font-bold text-gray-800">{user.name}</p>
+                                                    )}
                                                 </div>
                                             </div>
 
+                                            {/* Email */}
                                             <div className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
                                                 <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
                                                     <Mail className="w-5 h-5 text-purple-600" />
                                                 </div>
                                                 <div className="flex-1">
                                                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Email Address</label>
-                                                    <p className="text-sm font-bold text-gray-800">{user.email || "Not Linked"}</p>
+                                                    {isEditing ? (
+                                                        <input
+                                                            type="email"
+                                                            value={editEmail}
+                                                            onChange={(e) => setEditEmail(e.target.value)}
+                                                            className="w-full text-sm font-bold text-gray-800 bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                            placeholder="Enter your email"
+                                                        />
+                                                    ) : (
+                                                        <p className="text-sm font-bold text-gray-800">{user.email || "Not Linked"}</p>
+                                                    )}
                                                 </div>
                                             </div>
 
+                                            {/* Phone */}
                                             <div className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:bg-white hover:shadow-md transition-all">
                                                 <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
                                                     <Phone className="w-5 h-5 text-green-600" />
                                                 </div>
                                                 <div className="flex-1">
                                                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Phone Number</label>
-                                                    <p className="text-sm font-bold text-gray-800">{user.phone || "Not Linked"}</p>
+                                                    {isEditing ? (
+                                                        <input
+                                                            type="tel"
+                                                            value={editPhone}
+                                                            onChange={(e) => setEditPhone(e.target.value)}
+                                                            className="w-full text-sm font-bold text-gray-800 bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                            placeholder="Enter your phone number"
+                                                        />
+                                                    ) : (
+                                                        <p className="text-sm font-bold text-gray-800">{user.phone || "Not Linked"}</p>
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -220,8 +359,6 @@ const ProfilePage = () => {
                                             </div>
                                         ))}
                                     </div>
-
-
 
                                     {/* Logout Session Button */}
                                     <motion.button

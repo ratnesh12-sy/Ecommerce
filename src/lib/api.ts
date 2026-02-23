@@ -93,3 +93,35 @@ export function firebaseLoginAPI(idToken: string): Promise<AuthResponse> {
         body: JSON.stringify({ idToken }),
     });
 }
+
+// ─── User Profile API ───────────────────────────────────────
+
+export interface UserProfileResponse {
+    id: number;
+    name: string;
+    email: string | null;
+    mobileNumber: string | null;
+    membershipLevel: string;
+    loyaltyPoints: number;
+    walletBalance: number;
+    createdAt: string;
+}
+
+export interface UpdateProfileRequest {
+    name?: string;
+    email?: string;
+    mobileNumber?: string;
+}
+
+/** Get the authenticated user's profile */
+export function getUserProfile(): Promise<UserProfileResponse> {
+    return apiFetch<UserProfileResponse>("/api/user/profile");
+}
+
+/** Update the authenticated user's profile */
+export function updateUserProfile(data: UpdateProfileRequest): Promise<UserProfileResponse> {
+    return apiFetch<UserProfileResponse>("/api/user/profile", {
+        method: "PUT",
+        body: JSON.stringify(data),
+    });
+}
