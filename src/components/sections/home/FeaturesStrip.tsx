@@ -22,9 +22,9 @@ const features = [
 
 export default function FeaturesStrip() {
     return (
-        <section className="border-y border-gray-100 bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
+        <section className="bg-white py-12 border-b border-gray-100">
+            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:divide-x md:divide-gray-100">
                     {features.map((feat, i) => (
                         <motion.div
                             key={feat.label}
@@ -33,14 +33,14 @@ export default function FeaturesStrip() {
                             viewport={{ once: true, margin: "-50px" }}
                             variants={fadeUp}
                             custom={i}
-                            className="flex items-center gap-4 py-6 px-4 md:px-6"
+                            className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-5 px-6"
                         >
-                            <div className="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                                <feat.icon className="w-5 h-5 text-blue-600" />
+                            <div className="w-14 h-14 rounded-2xl bg-blue-50/50 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                                <feat.icon className="w-6 h-6 text-blue-600 drop-shadow-sm" />
                             </div>
                             <div>
-                                <p className="font-bold text-gray-900 text-sm leading-none">{feat.label}</p>
-                                <p className="text-[11px] text-gray-400 font-medium mt-1">{feat.desc}</p>
+                                <h4 className="font-black text-gray-900 text-base tracking-tight uppercase">{feat.label}</h4>
+                                <p className="text-sm text-gray-500 font-medium mt-1 leading-relaxed">{feat.desc}</p>
                             </div>
                         </motion.div>
                     ))}

@@ -123,9 +123,10 @@ const LoginPage = () => {
             setPhoneStep("otp");
             setResendTimer(30);
             setTimeout(() => otpRefs.current[0]?.focus(), 100);
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const firebaseError = err as { code?: string; message?: string };
             console.error("Send OTP error:", err);
-            if (err.code === "auth/billing-not-enabled") {
+            if (firebaseError.code === "auth/billing-not-enabled") {
                 alert("Firebase Phone Auth requires a billing account or 'Test Phone Numbers'. \n\nTo fix this:\n1. Open Firebase Console\n2. Go to Authentication > Search 'Test Phone Numbers'\n3. Add your number and a fixed code (e.g. 123456) for testing.");
             } else {
                 alert(err instanceof Error ? err.message : "Failed to send OTP");
@@ -133,7 +134,7 @@ const LoginPage = () => {
 
             // Critical: Always clear and recreate on failure
             if (verifierRef.current) {
-                try { verifierRef.current.clear(); } catch (e) { }
+                try { verifierRef.current.clear(); } catch { }
                 verifierRef.current = null;
                 window.recaptchaVerifier = undefined;
             }

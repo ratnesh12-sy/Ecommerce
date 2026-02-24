@@ -37,7 +37,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Navbar />
-          <main>
+          <main className="page-fade-in">
             {children}
           </main>
           <MobileBottomNav />

@@ -26,21 +26,29 @@ const categories = [
 
 export default function CategoriesGrid() {
     return (
-        <section className="py-20 bg-gray-50/50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-24 bg-white relative">
+            {/* Background elements */}
+            <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-gray-50/50 to-transparent" />
+
+            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-80px" }}
                     variants={stagger}
-                    className="text-center mb-12"
+                    className="flex flex-col md:flex-row md:items-end justify-between mb-16"
                 >
-                    <motion.p variants={fadeUp} className="text-xs font-black text-blue-600 uppercase tracking-widest mb-2">
-                        Browse
+                    <div className="text-left">
+                        <motion.p variants={fadeUp} className="text-xs font-black text-blue-600 uppercase tracking-[0.25em] mb-3">
+                            Collections
+                        </motion.p>
+                        <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight">
+                            Shop by <span className="text-gradient-primary">Category</span>
+                        </motion.h2>
+                    </div>
+                    <motion.p variants={fadeUp} className="text-gray-500 max-w-sm mt-4 md:mt-0 text-lg font-medium">
+                        Explore our curated selection of high-quality products across multiple categories.
                     </motion.p>
-                    <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
-                        Shop by Category
-                    </motion.h2>
                 </motion.div>
 
                 <motion.div
@@ -48,24 +56,31 @@ export default function CategoriesGrid() {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-80px" }}
                     variants={stagger}
-                    className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
+                    className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
                 >
                     {categories.map((cat, i) => (
                         <motion.div
                             key={cat.label}
                             variants={fadeUp}
                             custom={i}
-                            whileHover={{ y: -6, scale: 1.02 }}
-                            className="group relative bg-white rounded-[2rem] p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/40 transition-all cursor-pointer"
+                            whileHover={{ y: -8 }}
+                            className="group relative bg-gray-50/50 rounded-[2.5rem] p-8 md:p-10 border border-transparent hover:border-blue-100 hover:bg-white transition-all duration-500 cursor-pointer overflow-hidden shadow-sm hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)]"
                         >
+                            {/* Hover Gradient Border Effect */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-transparent to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500" />
+
                             <div
-                                className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}
+                                className={`w-16 h-16 rounded-3xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-8 shadow-xl shadow-blue-500/20 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}
                             >
-                                <cat.icon className="w-7 h-7 text-white" />
+                                <cat.icon className="w-8 h-8 text-white" />
                             </div>
-                            <h3 className="font-bold text-gray-900 text-lg">{cat.label}</h3>
-                            <p className="text-xs text-gray-400 font-medium mt-1">{cat.count}</p>
-                            <ChevronRight className="absolute top-8 right-6 w-5 h-5 text-gray-200 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+
+                            <h3 className="font-black text-gray-900 text-xl tracking-tight mb-2 group-hover:text-blue-600 transition-colors uppercase">{cat.label}</h3>
+                            <p className="text-sm text-gray-400 font-bold tracking-wide uppercase opacity-70 mb-8">{cat.count}</p>
+
+                            <div className="flex items-center gap-2 text-blue-600 font-black text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                                Explore Now <ChevronRight className="w-4 h-4" />
+                            </div>
                         </motion.div>
                     ))}
                 </motion.div>

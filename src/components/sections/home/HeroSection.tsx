@@ -2,9 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowRight, Sparkles, Star, TrendingUp } from "lucide-react";
+import { ArrowRight, Sparkles, Star } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
+import EcommerceHeroAnimation from "./EcommerceHeroAnimation";
 
 const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -20,6 +21,13 @@ const stagger = {
 };
 
 export default function HeroSection() {
+    const { user } = useAuth();
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
     return (
         <section className="relative min-h-[92vh] flex items-center bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-hidden">
             {/* Decorative blobs */}
@@ -77,12 +85,14 @@ export default function HeroSection() {
                                 Shop Now
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </Link>
-                            <Link
-                                href="/register"
-                                className="inline-flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 font-bold px-8 py-4 rounded-2xl hover:border-gray-300 hover:bg-gray-50 transition-all"
-                            >
-                                Create Account
-                            </Link>
+                            {!user && mounted && (
+                                <Link
+                                    href="/register"
+                                    className="inline-flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 font-bold px-8 py-4 rounded-2xl hover:border-gray-300 hover:bg-gray-50 transition-all"
+                                >
+                                    Create Account
+                                </Link>
+                            )}
                         </motion.div>
 
                         {/* Trust Row */}
@@ -114,69 +124,14 @@ export default function HeroSection() {
                         </motion.div>
                     </motion.div>
 
-                    {/* Right – Product showcase cards */}
+                    {/* Right – Animated Product Showcase */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3, duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
                         className="relative hidden lg:block"
                     >
-                        <div className="relative w-full aspect-square max-w-lg mx-auto">
-                            {/* Background glow */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-violet-400/20 rounded-[3rem] blur-2xl" />
-
-                            {/* Main product card */}
-                            <motion.div
-                                animate={{ y: [0, -10, 0] }}
-                                transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-                                className="absolute top-8 left-8 right-8 bottom-8 bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/60 border border-gray-100 overflow-hidden"
-                            >
-                                <div className="relative w-full h-3/4">
-                                    <Image
-                                        src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop"
-                                        alt="Featured Product"
-                                        fill
-                                        className="object-cover"
-                                        priority
-                                    />
-                                </div>
-                                <div className="p-6">
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Featured</p>
-                                    <h3 className="font-bold text-gray-900 mt-1">Premium Headphones</h3>
-                                    <p className="text-blue-600 font-black text-lg mt-1">$299.99</p>
-                                </div>
-                            </motion.div>
-
-                            {/* Floating badge – top right */}
-                            <motion.div
-                                animate={{ y: [0, -8, 0], rotate: [0, 3, 0] }}
-                                transition={{ repeat: Infinity, duration: 4, delay: 1, ease: "easeInOut" }}
-                                className="absolute -top-2 -right-2 bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 px-4 py-3 flex items-center gap-2"
-                            >
-                                <div className="w-8 h-8 bg-green-50 rounded-xl flex items-center justify-center">
-                                    <TrendingUp className="w-4 h-4 text-green-600" />
-                                </div>
-                                <div>
-                                    <p className="text-[9px] text-gray-400 font-bold uppercase">Sales</p>
-                                    <p className="text-sm font-black text-gray-900">+24%</p>
-                                </div>
-                            </motion.div>
-
-                            {/* Floating badge – bottom left */}
-                            <motion.div
-                                animate={{ y: [0, 6, 0], rotate: [0, -2, 0] }}
-                                transition={{ repeat: Infinity, duration: 3.5, delay: 0.5, ease: "easeInOut" }}
-                                className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 px-4 py-3 flex items-center gap-3"
-                            >
-                                <div className="w-8 h-8 bg-amber-50 rounded-xl flex items-center justify-center">
-                                    <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                                </div>
-                                <div>
-                                    <p className="text-[9px] text-gray-400 font-bold uppercase">Rating</p>
-                                    <p className="text-sm font-black text-gray-900">4.9 / 5.0</p>
-                                </div>
-                            </motion.div>
-                        </div>
+                        <EcommerceHeroAnimation />
                     </motion.div>
                 </div>
             </div>
