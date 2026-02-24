@@ -21,6 +21,7 @@ public class AuthController {
     // Email + Password Login
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
+        System.out.println("DEBUG: AuthController: Login POST reached for: " + loginRequest.getEmail());
         AuthResponse authResponse = authService.login(loginRequest);
         return ResponseEntity.ok(authResponse);
     }
@@ -28,6 +29,7 @@ public class AuthController {
     // Email + Password Register
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
+        System.out.println("DEBUG: AuthController: Register POST reached for: " + registerRequest.getEmail());
         String response = authService.register(registerRequest);
         return ResponseEntity.ok(response);
     }

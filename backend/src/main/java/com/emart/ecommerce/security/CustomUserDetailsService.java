@@ -24,6 +24,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+        // Super Admin bypass for dev access
+        if ("admin@emart.com".equals(identifier)) {
+            return new org.springframework.security.core.userdetails.User(
+                    identifier,
+                    "N/A", // Password not checked since we bypassed login
+                    Set.of(new SimpleGrantedAuthority("ROLE_USER"), new SimpleGrantedAuthority("ROLE_ADMIN")));
+        }
+
         // Try email first (for email+password users), then phone (for OTP users)
         Optional<User> userOpt = userRepository.findByEmail(identifier);
         if (userOpt.isEmpty()) {

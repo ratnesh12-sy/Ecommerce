@@ -34,14 +34,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = getJwtFromRequest(request);
 
         if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-            String username = tokenProvider.getUsername(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            try {
+                String username = tokenProvider.getUsername(token);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } catch (Exception e) {
+                System.out.println(
+                        "DEBUG: JwtAuthenticationFilter: Failed to set user authentication: " + e.getMessage());
+                // Don't throw exception, just continue the filter chain without authentication
+                // The SecurityConfig will decide if the route requires authentication later
+            }
         }
 
         filterChain.doFilter(request, response);

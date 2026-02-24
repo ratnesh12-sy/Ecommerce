@@ -104,6 +104,7 @@ export interface UserProfileResponse {
     membershipLevel: string;
     loyaltyPoints: number;
     walletBalance: number;
+    roles: string[];
     createdAt: string;
 }
 
@@ -123,5 +124,20 @@ export function updateUserProfile(data: UpdateProfileRequest): Promise<UserProfi
     return apiFetch<UserProfileResponse>("/api/user/profile", {
         method: "PUT",
         body: JSON.stringify(data),
+    });
+}
+
+// ─── Admin API ─────────────────────────────────────────────
+
+/** Admin: Get all users */
+export function getAllUsersAdmin(): Promise<UserProfileResponse[]> {
+    return apiFetch<UserProfileResponse[]>("/api/admin/users");
+}
+
+/** Admin: Update user roles */
+export function updateUserRolesAdmin(userId: number, roles: string[]): Promise<UserProfileResponse> {
+    return apiFetch<UserProfileResponse>(`/api/admin/users/${userId}/roles`, {
+        method: "PUT",
+        body: JSON.stringify(roles),
     });
 }

@@ -1,6 +1,7 @@
 package com.emart.ecommerce.dto;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class UserProfileResponse {
 
@@ -11,6 +12,7 @@ public class UserProfileResponse {
     private String membershipLevel;
     private Integer loyaltyPoints;
     private Double walletBalance;
+    private Set<String> roles;
     private LocalDateTime createdAt;
 
     public UserProfileResponse() {
@@ -72,6 +74,14 @@ public class UserProfileResponse {
 
     public void setWalletBalance(Double walletBalance) {
         this.walletBalance = walletBalance;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 
     public LocalDateTime getCreatedAt() {

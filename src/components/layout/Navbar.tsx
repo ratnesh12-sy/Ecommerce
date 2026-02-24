@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Search, ShoppingCart, User, LogIn, MapPin } from "lucide-react";
+import { Search, ShoppingCart, User, LogIn, MapPin, Shield } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -92,6 +92,17 @@ const Navbar = () => {
                                                 <p className="text-sm font-semibold text-gray-700 leading-none">{user.name.split(' ')[0]}</p>
                                             </div>
                                         </Link>
+
+                                        {user.roles?.includes("ROLE_ADMIN") && (
+                                            <Link
+                                                href="/admin/dashboard"
+                                                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50 text-orange-600 border border-orange-100 hover:bg-orange-100 transition-all text-xs font-bold"
+                                            >
+                                                <Shield className="w-3.5 h-3.5" />
+                                                Admin Panel
+                                            </Link>
+                                        )}
+
                                         <button onClick={logout} className="text-xs md:text-sm text-gray-500 hover:text-red-500 font-bold px-2 py-1">Logout</button>
                                     </motion.div>
                                 )}

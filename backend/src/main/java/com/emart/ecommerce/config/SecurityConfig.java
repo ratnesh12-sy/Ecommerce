@@ -30,8 +30,9 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        System.out.println("DEBUG: SecurityConfig: Initializing CORS configuration allowed origins: *");
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedOriginPatterns(List.of("*")); // Allow all patterns
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -49,8 +50,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/**").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user/**").authenticated()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/**").permitAll()
+                        .anyRequest().permitAll()) // Temporarily permit all for debugging
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

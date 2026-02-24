@@ -7,6 +7,7 @@ interface User {
     name: string;
     email?: string;
     phone?: string;
+    roles?: string[];
 }
 
 interface AuthContextType {
@@ -19,6 +20,7 @@ interface AuthContextType {
     logout: () => void;
     clearError: () => void;
     updateUser: (updatedUser: User) => void;
+    adminLogin: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,6 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 name: profile.name || fallbackName,
                 email: profile.email || fallbackEmail,
                 phone: profile.mobileNumber || fallbackPhone,
+                roles: profile.roles
             };
             setUser(newUser);
             localStorage.setItem("emart_user", JSON.stringify(newUser));
@@ -127,8 +130,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem("emart_token");
     }, []);
 
+    // ─── Admin Dedicated Login ───
+    const adminLogin = useCallback(async (email: string, password: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await loginAPI(email, password);
+
+            // The backend profile now includes roles
+            // We need to check if the user HAS ROLE_ADMIN before setting the token
+            // To be safe, we fetch the profile first
+            localStorage.setItem("emart_token", response.accessToken);
+            const profile = await getUserProfile();
+
+            if (!profile.roles.includes("ROLE_ADMIN")) {
+                localStorage.removeItem("emart_token");
+                throw new Error("Access Denied: Admin role required.");
+            }
+
+            const newUser: User = {
+                name: profile.name,
+                email: profile.email || email,
+                phone: profile.mobileNumber || undefined,
+                roles: profile.roles
+            };
+            setUser(newUser);
+            localStorage.setItem("emart_user", JSON.stringify(newUser));
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Admin login failed.";
+            setError(message);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     return (
-        <AuthContext.Provider value={{ user, loading, error, login, register, loginWithPhone, logout, clearError, updateUser }}>
+        <AuthContext.Provider value={{ user, loading, error, login, register, loginWithPhone, logout, clearError, updateUser, adminLogin }}>
             {children}
         </AuthContext.Provider>
     );

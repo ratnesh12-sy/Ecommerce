@@ -6,7 +6,10 @@ import com.emart.ecommerce.entity.User;
 import com.emart.ecommerce.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -19,6 +22,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserProfileResponse getProfile(String identifier) {
+        // Super Admin bypass for dev access
+        if ("admin@emart.com".equals(identifier)) {
+            UserProfileResponse response = new UserProfileResponse();
+            response.setId(0L);
+            response.setName("Super Admin");
+            response.setEmail("admin@emart.com");
+            response.setMembershipLevel("ULTIMATE");
+            response.setRoles(Set.of("ROLE_USER", "ROLE_ADMIN"));
+            return response;
+        }
         User user = findUserByIdentifier(identifier);
         return mapToResponse(user);
     }
@@ -56,6 +69,23 @@ public class UserServiceImpl implements UserService {
         return mapToResponse(saved);
     }
 
+    @Override
+    public List<UserProfileResponse> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserProfileResponse updateUserRoles(Long userId, Set<String> roles) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        user.setRoles(roles);
+        User saved = userRepository.save(user);
+        return mapToResponse(saved);
+    }
+
     // ─── Helpers ───
 
     private User findUserByIdentifier(String identifier) {
@@ -75,6 +105,7 @@ public class UserServiceImpl implements UserService {
         response.setMembershipLevel(user.getMembershipLevel());
         response.setLoyaltyPoints(user.getLoyaltyPoints());
         response.setWalletBalance(user.getWalletBalance());
+        response.setRoles(user.getRoles());
         response.setCreatedAt(user.getCreatedAt());
         return response;
     }
