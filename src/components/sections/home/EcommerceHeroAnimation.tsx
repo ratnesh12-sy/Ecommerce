@@ -12,7 +12,7 @@ const products = [
         price: "$129.99",
         image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=400&auto=format&fit=crop",
         delay: 0,
-        initialPos: { x: -80, y: -80 },
+        initialPos: { x: -160, y: -160 },
     },
     {
         id: 2,
@@ -20,7 +20,7 @@ const products = [
         price: "$999.00",
         image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=400&auto=format&fit=crop",
         delay: 0.2,
-        initialPos: { x: 100, y: -100 },
+        initialPos: { x: 180, y: -140 },
     },
     {
         id: 3,
@@ -28,7 +28,7 @@ const products = [
         price: "$249.99",
         image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=400&auto=format&fit=crop",
         delay: 0.4,
-        initialPos: { x: -120, y: 100 },
+        initialPos: { x: -180, y: 150 },
     },
     {
         id: 4,
@@ -36,7 +36,7 @@ const products = [
         price: "$399.00",
         image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=400&auto=format&fit=crop",
         delay: 0.6,
-        initialPos: { x: 120, y: 120 },
+        initialPos: { x: 160, y: 170 },
     },
 ];
 

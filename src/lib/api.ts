@@ -141,3 +141,20 @@ export function updateUserRolesAdmin(userId: number, roles: string[]): Promise<U
         body: JSON.stringify(roles),
     });
 }
+
+// ─── Products API ──────────────────────────────────────────
+
+export interface ProductResponse {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    stockQuantity: number;
+    category: string;
+    imageUrl: string;
+}
+
+/** Get all products */
+export function getAllProducts(): Promise<ProductResponse[]> {
+    return apiFetch<ProductResponse[]>("/api/products");
+}

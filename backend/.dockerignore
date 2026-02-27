@@ -1,9 +1,0 @@
-target/
-*.jar
-.mvn/
-mvnw
-mvnw.cmd
-.git/
-.vscode/
-Dockerfile
-docker-compose.yml
