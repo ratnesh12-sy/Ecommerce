@@ -42,7 +42,7 @@ const products = [
 
 export default function EcommerceHeroAnimation() {
     return (
-        <div className="relative w-full aspect-square max-w-2xl mx-auto flex items-center justify-center overflow-visible">
+        <div className="relative w-full aspect-[2/1] sm:aspect-square max-w-2xl mx-auto flex items-center justify-center overflow-visible scale-[0.25] min-[400px]:scale-40 sm:scale-[0.55] lg:scale-100 mt-[-4rem] mb-[-220px] sm:mt-0 sm:mb-[-80px] lg:mb-0 origin-center">
             {/* Central Glow */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-[100px]" />
             <div className="absolute w-1/2 h-1/2 bg-blue-500/10 rounded-full blur-[80px] animate-pulse" />
@@ -52,7 +52,7 @@ export default function EcommerceHeroAnimation() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1, ease: "easeOut" }}
-                className="relative z-10 w-64 h-64 md:w-80 md:h-80 rounded-[3rem] bg-white/40 backdrop-blur-3xl border border-white/40 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] flex flex-col items-center justify-center p-8 text-center overflow-hidden group"
+                className="relative z-10 w-80 h-80 rounded-[3rem] bg-white/40 backdrop-blur-3xl border border-white/40 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] flex flex-col items-center justify-center p-8 text-center overflow-hidden group"
             >
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-purple-500/10" />
 
@@ -103,7 +103,7 @@ export default function EcommerceHeroAnimation() {
                             ease: "easeInOut",
                             delay: product.delay
                         }}
-                        className="w-28 h-28 md:w-44 md:h-44 bg-white/60 backdrop-blur-2xl rounded-[2.5rem] border border-white/60 shadow-2xl overflow-hidden group hover:scale-110 hover:-translate-y-4 transition-all duration-500 cursor-pointer"
+                        className="w-44 h-44 bg-white/60 backdrop-blur-2xl rounded-[2.5rem] border border-white/60 shadow-2xl overflow-hidden group hover:scale-110 hover:-translate-y-4 transition-all duration-500 cursor-pointer"
                     >
                         <div className="relative w-full h-full">
                             <Image

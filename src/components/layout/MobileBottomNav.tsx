@@ -15,6 +15,7 @@ const MobileBottomNav = () => {
     }, []);
 
     if (!mounted) return null;
+    if (pathname?.startsWith("/admin")) return null;
 
     const navItems = [
         { label: "Home", icon: Home, href: "/" },
@@ -25,8 +26,8 @@ const MobileBottomNav = () => {
     ];
 
     return (
-        <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[95%] sm:max-w-md px-2">
-            <nav className="bg-white/95 backdrop-blur-xl border border-gray-100 shadow-2xl rounded-[2rem] h-16 py-1 px-4">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] w-full bg-white/95 backdrop-blur-xl border-t border-gray-200 pb-safe">
+            <nav className="h-16 px-2 sm:px-4">
                 <ul className="flex justify-between items-center h-full">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;

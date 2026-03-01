@@ -55,7 +55,8 @@ body {
 /* Mobile bottom nav clearance */
 @media (max-width: 767px) {
   footer {
-    padding-bottom: 6rem;
+    padding-bottom: env(safe-area-inset-bottom, 5rem);
+    margin-bottom: 4rem;
   }
 }
 

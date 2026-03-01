@@ -49,14 +49,14 @@ export default function Newsletter() {
 
                         <motion.div
                             variants={fadeUp}
-                            className="mt-12 flex flex-col sm:flex-row gap-4 max-w-lg mx-auto"
+                            className="mt-8 sm:mt-12 flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-lg mx-auto"
                         >
                             <input
                                 type="email"
                                 placeholder="name@yourmail.com"
-                                className="flex-1 px-8 py-5 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all duration-300 shadow-inner"
+                                className="flex-1 px-6 py-4 text-sm sm:px-8 sm:py-5 sm:text-base bg-gray-50 border border-gray-100 rounded-2xl font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all duration-300 shadow-inner"
                             />
-                            <button className="bg-black text-white font-black uppercase tracking-widest px-10 py-5 rounded-2xl hover:bg-blue-600 shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 hover:-translate-y-1">
+                            <button className="bg-black text-white font-black uppercase tracking-widest px-6 py-4 text-sm sm:px-10 sm:py-5 sm:text-base rounded-2xl hover:bg-blue-600 shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 hover:-translate-y-1">
                                 Subscribe
                             </button>
                         </motion.div>

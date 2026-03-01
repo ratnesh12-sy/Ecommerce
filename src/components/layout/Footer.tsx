@@ -2,10 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { Facebook, Twitter, Instagram, Github, Mail, Phone, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
+    const pathname = usePathname();
+
+    if (pathname?.startsWith("/admin")) return null;
 
     return (
         <footer className="bg-gray-50 border-t border-gray-100 pb-28 md:pb-0">

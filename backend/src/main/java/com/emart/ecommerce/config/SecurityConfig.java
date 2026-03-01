@@ -32,11 +32,13 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        System.out.println("DEBUG: SecurityConfig: Initializing CORS configuration allowed origins: *");
+        System.out.println("DEBUG: SecurityConfig: Initializing CORS configuration");
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*")); // Allow all patterns
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        // Replace with actual production frontend URL when deploying
+        config.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://localhost:8080"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+        config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -48,14 +50,22 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Stateless APIs typically disable CSRF
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> headers
+                        .xssProtection(xss -> xss.disable()) // Usually handled by frontend frameworks, disabled here
+                                                             // for modern config
+                        .contentSecurityPolicy(cps -> cps.policyDirectives("default-src 'self'"))
+                        .frameOptions(frame -> frame.deny())
+                        .contentTypeOptions(contentType -> contentType.disable()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/user/**").authenticated()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/**").permitAll()
-                        .anyRequest().permitAll()) // Temporarily permit all for debugging
+                        .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/**",
+                                "/api/categories/**")
+                        .permitAll()
+                        .anyRequest().authenticated()) // Deny all other unauthenticated requests by default
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

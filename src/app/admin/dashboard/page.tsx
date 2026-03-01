@@ -9,8 +9,8 @@ export default function AdminDashboard() {
     return (
         <AdminLayout>
             <div className="mb-10">
-                <h2 className="text-3xl font-black text-gray-900 tracking-tight">System Overview</h2>
-                <p className="text-gray-500 font-medium">Global statistics and performance metrics</p>
+                <h2 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">System Overview</h2>
+                <p className="text-[#6B7280] font-medium text-[15px]">Global statistics and performance metrics</p>
             </div>
 
             <DashboardStats />

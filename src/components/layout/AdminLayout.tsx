@@ -14,18 +14,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const menuItems = [
         { name: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
         { name: "User Management", icon: Users, href: "/admin/users" },
-        { name: "Products", icon: ShoppingBag, href: "#" },
-        { name: "Analytics", icon: PieChart, href: "#" },
+        { name: "Products", icon: ShoppingBag, href: "/admin/products" },
+        { name: "Analytics", icon: PieChart, href: "/admin/analytics" },
     ];
 
     return (
         <AdminGuard>
-            <div className="min-h-screen bg-gray-50 flex">
+            <div className="min-h-screen bg-[#F9FAFB] flex font-sans">
                 {/* Sidebar */}
-                <aside className="w-72 bg-white border-r border-gray-100 flex flex-col sticky top-0 h-screen">
+                <aside className="w-[280px] bg-[#0B0F19] flex flex-col sticky top-0 h-screen transition-all duration-300">
                     <div className="p-8">
-                        <Link href="/" className="text-2xl font-black tracking-tighter text-gray-900 block hover:opacity-80 transition-opacity">
-                            e-mart <span className="text-blue-600">HQ</span>
+                        <Link href="/" className="flex items-center gap-3 text-xl font-bold text-white block hover:opacity-80 transition-opacity">
+                            <div className="w-8 h-8 rounded-full bg-indigo-500 font-bold text-sm flex items-center justify-center text-white">eM</div>
+                            e-mart <span className="text-gray-400 font-normal text-sm ml-1">HQ</span>
                         </Link>
                     </div>
 
@@ -36,12 +37,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                 <Link
                                     key={item.name}
                                     href={item.href}
-                                    className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all ${isActive
-                                            ? "bg-blue-50 text-blue-600 shadow-sm"
-                                            : "text-gray-500 hover:bg-gray-50"
+                                    className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-medium text-[15px] transition-all duration-200 ${isActive
+                                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/20"
+                                        : "text-gray-400 hover:text-white hover:bg-white/5"
                                         }`}
                                 >
-                                    <item.icon className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-400"}`} />
+                                    <item.icon className={`w-[22px] h-[22px] ${isActive ? "text-white" : "text-gray-400"}`} />
                                     {item.name}
                                 </Link>
                             );
@@ -49,34 +50,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </nav>
 
                     <div className="p-4 mt-auto border-t border-gray-50">
-                        <div className="mb-4 px-4">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Authenticated as</p>
-                            <p className="text-xs font-bold text-gray-900 truncate">{user?.name || "Administrator"}</p>
+                        <div className="mb-4 px-4 flex items-center gap-3">
+                            <Settings className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors cursor-pointer" />
+                            <span className="text-gray-400 font-medium text-[15px] cursor-pointer hover:text-white transition-colors">Settings</span>
                         </div>
                         <button
                             onClick={logout}
-                            className="flex items-center justify-center gap-2 w-full px-4 py-4 bg-red-50 text-red-600 hover:bg-red-100 rounded-2xl font-bold text-sm transition-colors"
+                            className="flex items-center justify-center gap-2 w-full px-4 py-3 mt-4 text-gray-400 hover:text-red-400 hover:bg-white/5 rounded-2xl font-medium text-[15px] transition-colors"
                         >
                             <LogOut className="w-5 h-5" />
-                            System Logout
+                            Logout
                         </button>
                     </div>
                 </aside>
 
                 {/* Content Area */}
-                <div className="flex-1 flex flex-col">
-                    <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-10 backdrop-blur-sm bg-white/80">
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <header className="h-20 bg-transparent flex items-center justify-between px-10 pt-4 pb-2 z-10">
                         <div className="flex items-center gap-2">
-                            <Shield className="w-5 h-5 text-blue-600" />
-                            <span className="text-sm font-bold text-gray-400 tracking-tight uppercase">Admin Console</span>
+                            {/* Title will go dynamically in the page component instead */}
                         </div>
-                        <div className="flex items-center gap-4">
-                            <button className="p-2.5 bg-gray-50 border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 transition-colors">
-                                <Bell className="w-5 h-5" />
+                        <div className="flex items-center gap-6">
+                            <button className="relative text-gray-400 hover:text-gray-600 transition-colors">
+                                <Bell className="w-[22px] h-[22px]" />
+                                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                             </button>
-                            <button className="p-2.5 bg-gray-50 border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 transition-colors">
-                                <Settings className="w-5 h-5" />
-                            </button>
+                            <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+                                <div className="flex flex-col items-end">
+                                    <span className="text-sm font-semibold text-gray-900">{user?.name || "Administrator"}</span>
+                                    <span className="text-[11px] text-gray-500">Admin</span>
+                                </div>
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                    {user?.name?.substring(0, 2).toUpperCase() || "AD"}
+                                </div>
+                            </div>
                             <div className="w-px h-6 bg-gray-100 mx-2" />
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
@@ -85,7 +92,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             </div>
                         </div>
                     </header>
-                    <main className="flex-1 p-8">
+                    <main className="flex-1 px-10 py-6 overflow-y-auto">
                         {children}
                     </main>
                 </div>

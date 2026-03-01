@@ -60,8 +60,10 @@ public class JwtTokenProvider {
             Jwts.parserBuilder()
                     .setSigningKey(key())
                     .build()
-                    .parse(token);
+                    .parseClaimsJws(token);
             return true;
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            System.err.println("Invalid JWT signature");
         } catch (MalformedJwtException e) {
             System.err.println("Invalid JWT token");
         } catch (ExpiredJwtException e) {
@@ -73,4 +75,25 @@ public class JwtTokenProvider {
         }
         return false;
     }
+
+    public Set<GrantedAuthority> getRoles(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        Object rolesObject = claims.get("roles");
+
+        if (rolesObject instanceof java.util.Collection<?>) {
+            return ((java.util.Collection<?>) rolesObject)
+                    .stream()
+                    .map(Object::toString)
+                    .map(org.springframework.security.core.authority.SimpleGrantedAuthority::new)
+                    .collect(Collectors.toSet());
+        }
+
+        return Set.of();
+    }
+
 }

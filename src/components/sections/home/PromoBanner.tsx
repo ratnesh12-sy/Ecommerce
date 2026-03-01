@@ -23,7 +23,7 @@ export default function PromoBanner() {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-80px" }}
                     variants={fadeUp}
-                    className="relative bg-gradient-to-br from-blue-700 via-indigo-800 to-violet-900 rounded-[3rem] p-12 md:p-24 overflow-hidden shadow-[0_48px_100px_-24px_rgba(37,99,235,0.3)]"
+                    className="relative bg-gradient-to-br from-blue-700 via-indigo-800 to-violet-900 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-12 md:p-24 overflow-hidden shadow-[0_48px_100px_-24px_rgba(37,99,235,0.3)]"
                 >
                     {/* Decorative high-end background elements */}
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-white/10 to-transparent rounded-full blur-[100px] -translate-y-1/2 translate-x-1/4" />
@@ -42,30 +42,30 @@ export default function PromoBanner() {
                         <div className="text-center lg:text-left">
                             <motion.div
                                 variants={fadeUp}
-                                className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-blue-100 text-xs font-black uppercase tracking-[0.3em] px-5 py-2 rounded-full mb-8"
+                                className="inline-flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-blue-100 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] px-4 py-1.5 sm:px-5 sm:py-2 rounded-full mb-6 sm:mb-8"
                             >
-                                <Zap className="w-4 h-4 text-amber-400" />
+                                <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
                                 Exclusive Flash Deal
                             </motion.div>
 
-                            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-[1.05] tracking-tight">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-white leading-[1.1] sm:leading-[1.05] tracking-tight">
                                 Get <span className="text-blue-300">30% Off</span> <br />
                                 Your First Order
                             </h2>
 
-                            <p className="text-blue-100/80 mt-8 text-lg md:text-xl max-w-xl font-medium leading-relaxed">
-                                Join thousands of smart shoppers and enjoy premium products at incredible prices. Use code <span className="font-black text-white px-3 py-1 bg-white/20 rounded-xl">WELCOME30</span>
+                            <p className="text-blue-100/80 mt-6 sm:mt-8 text-base sm:text-lg md:text-xl max-w-xl font-medium leading-relaxed">
+                                Join thousands of smart shoppers and enjoy premium products at incredible prices. Use code <span className="font-black text-white px-2 py-0.5 sm:px-3 sm:py-1 bg-white/20 rounded-lg sm:rounded-xl">WELCOME30</span>
                             </p>
 
-                            <div className="mt-12 flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
+                            <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row gap-3 sm:gap-5 justify-center lg:justify-start">
                                 <Link
                                     href="/register"
-                                    className="inline-flex items-center justify-center gap-3 bg-white text-blue-800 font-black px-12 py-5 rounded-2xl hover:bg-blue-50 transition-all shadow-2xl hover:scale-[1.05] active:scale-[0.98] group"
+                                    className="inline-flex items-center justify-center gap-2 sm:gap-3 bg-white text-blue-800 font-black px-6 py-4 text-sm sm:px-12 sm:py-5 sm:text-base rounded-2xl hover:bg-blue-50 transition-all shadow-2xl hover:scale-[1.05] active:scale-[0.98] group"
                                 >
                                     Claim This Offer
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+                                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1.5 transition-transform" />
                                 </Link>
-                                <button className="glass border border-white/20 text-blue-800 font-black px-12 py-5 rounded-2xl hover:bg-white/10 transition-all">
+                                <button className="glass border border-white/20 text-blue-800 font-black px-6 py-4 text-sm sm:px-12 sm:py-5 sm:text-base rounded-2xl hover:bg-white/10 transition-all">
                                     Learn More
                                 </button>
                             </div>

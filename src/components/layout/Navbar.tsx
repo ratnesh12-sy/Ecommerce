@@ -5,9 +5,11 @@ import Link from "next/link";
 import { Search, ShoppingCart, User, MapPin, Shield } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
     const { user, logout } = useAuth();
+    const pathname = usePathname();
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [location] = useState("Mumbai, India");
     const [mounted, setMounted] = React.useState(false);
@@ -15,6 +17,8 @@ const Navbar = () => {
     React.useEffect(() => {
         setMounted(true);
     }, []);
+
+    if (pathname?.startsWith("/admin")) return null;
 
     return (
         <nav className="sticky top-0 left-0 right-0 z-50 w-full glass-dark border-b border-white/10 shadow-2xl">
@@ -81,7 +85,7 @@ const Navbar = () => {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="flex items-center space-x-4"
+                                        className="hidden md:flex items-center space-x-4"
                                     >
                                         <Link href="/profile" className="flex items-center gap-2 group p-1 pr-3 rounded-full hover:bg-white/5 transition-colors">
                                             <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/10 flex items-center justify-center text-blue-400 transition-colors group-hover:bg-blue-600 group-hover:text-white">
