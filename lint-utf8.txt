@@ -1,0 +1,16 @@
+﻿
+C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\src\components\layout\AdminLayout.tsx
+  5:81  warning  'Shield' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\src\components\sections\admin\ProductManagementSection.tsx
+  5:10  warning  'motion' is defined but never used           @typescript-eslint/no-unused-vars
+  5:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\src\components\sections\home\TrendingProducts.tsx
+  34:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\admin\OneDrive\Documents\GitHub\Ecommerce\src\components\ui\StatCard.tsx
+  22:11  warning  'mappedColor' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Ô£û 5 problems (1 error, 4 warnings)
+

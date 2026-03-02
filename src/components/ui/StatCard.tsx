@@ -19,7 +19,6 @@ const StatCard = ({ title, value, change, icon: Icon, color }: StatCardProps) =>
         green: "text-emerald-500 bg-emerald-50",
         purple: "text-purple-600 bg-purple-50",
     };
-    const mappedColor = colorMap[color] || colorMap.blue;
     const isPositive = change.startsWith('+');
 
     return (

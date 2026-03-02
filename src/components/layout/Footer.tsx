@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, Facebook, Twitter, Instagram, Github, Mail, Phone } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const Footer = () => {

@@ -31,8 +31,9 @@ export default function TrendingProducts() {
                 const data = await getAllProducts();
                 // Take only up to 4 products for the trending section layout
                 setProducts(data.slice(0, 4));
-            } catch (err: any) {
-                setError(err.message || "Failed to load trending products");
+            } catch (err) {
+                const error = err as Error;
+                setError(error.message || "Failed to load trending products");
             } finally {
                 setLoading(false);
             }

@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Search, Plus, Package, Box, AlertTriangle, DollarSign, LayoutGrid, List } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 export default function ProductManagementSection() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -137,7 +136,7 @@ export default function ProductManagementSection() {
                                         <td className="px-8 py-5">
                                             <div className="flex flex-col gap-1">
                                                 <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold self-start ${p.stock > 20 ? 'bg-emerald-50 text-emerald-600' :
-                                                        p.stock > 0 ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
+                                                    p.stock > 0 ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
                                                     }`}>
                                                     {p.status}
                                                 </span>
@@ -163,7 +162,7 @@ export default function ProductManagementSection() {
                             <div className="flex items-center justify-between mt-auto">
                                 <span className="text-xl font-bold text-gray-900">${p.price.toFixed(2)}</span>
                                 <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${p.stock > 20 ? 'bg-emerald-50 text-emerald-600' :
-                                        p.stock > 0 ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
+                                    p.stock > 0 ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
                                     }`}>
                                     {p.status}
                                 </span>

@@ -2,7 +2,7 @@
 
 import React from "react";
 import AdminGuard from "@/components/auth/AdminGuard";
-import { LayoutDashboard, Users, ShoppingBag, PieChart, Bell, Settings, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingBag, PieChart, Bell, Settings, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
