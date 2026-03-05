@@ -3,9 +3,16 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Star, Heart, ShoppingCart, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
-import { getAllProducts, ProductResponse } from "@/lib/api";
+import { ArrowRight, Star, Heart, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+    getAllCategoriesAPI,
+    getProductsBySubCategoryAPI,
+    CategoryDTO,
+    SubCategoryDTO,
+    ProductResponse
+} from "@/lib/api";
+import { useCart } from "@/context/CartContext";
 
 const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -21,25 +28,62 @@ const stagger = {
 };
 
 export default function TrendingProducts() {
+    const { addToCart } = useCart();
+
+    const [categories, setCategories] = useState<CategoryDTO[]>([]);
+    const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
+    const [activeSubCategoryId, setActiveSubCategoryId] = useState<number | null>(null);
+
     const [products, setProducts] = useState<ProductResponse[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loadingCategories, setLoadingCategories] = useState(true);
+    const [loadingProducts, setLoadingProducts] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Initial Load: Fetch hierarchical categories
     useEffect(() => {
-        async function fetchTrendingProducts() {
+        async function fetchCategories() {
             try {
-                const data = await getAllProducts();
-                // Take only up to 4 products for the trending section layout
-                setProducts(data.slice(0, 4));
+                const data = await getAllCategoriesAPI();
+                setCategories(data);
+
+                if (data.length > 0) {
+                    setActiveCategoryId(data[0].id);
+                    if (data[0].subCategories && data[0].subCategories.length > 0) {
+                        setActiveSubCategoryId(data[0].subCategories[0].id);
+                    }
+                }
             } catch (err) {
                 const error = err as Error;
-                setError(error.message || "Failed to load trending products");
+                setError(error.message || "Failed to load categories");
             } finally {
-                setLoading(false);
+                setLoadingCategories(false);
             }
         }
-        fetchTrendingProducts();
+        fetchCategories();
     }, []);
+
+    // Fetch Products whenever the active subcategory changes
+    useEffect(() => {
+        if (!activeSubCategoryId) {
+            setProducts([]);
+            return;
+        }
+
+        async function fetchProducts() {
+            setLoadingProducts(true);
+            try {
+                const data = await getProductsBySubCategoryAPI(activeSubCategoryId!);
+                setProducts(data);
+            } catch (err) {
+                console.error("Failed to load products for subcategory:", err);
+            } finally {
+                setLoadingProducts(false);
+            }
+        }
+        fetchProducts();
+    }, [activeSubCategoryId]);
+
+    const activeCategory = categories.find(c => c.id === activeCategoryId);
 
     return (
         <section className="py-24 bg-white relative overflow-hidden">
@@ -69,7 +113,7 @@ export default function TrendingProducts() {
                     </motion.div>
                 </motion.div>
 
-                {loading ? (
+                {loadingCategories ? (
                     <div className="flex justify-center items-center py-20">
                         <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
                     </div>
@@ -77,94 +121,160 @@ export default function TrendingProducts() {
                     <div className="text-center py-20">
                         <p className="text-red-500 font-bold">{error}</p>
                     </div>
-                ) : products.length === 0 ? (
+                ) : categories.length === 0 ? (
                     <div className="text-center mt-12 mb-12">
                         <p className="text-gray-500 text-lg">New products arriving soon! Check back later.</p>
                     </div>
                 ) : (
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true, margin: "-80px" }}
-                        variants={stagger}
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
-                    >
-                        {products.map((product, i) => (
-                            <motion.div
-                                key={product.id}
-                                variants={fadeUp}
-                                custom={i}
-                                whileHover={{ y: -12 }}
-                                className="group relative bg-white/70 backdrop-blur-sm rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] transition-all duration-500 cursor-pointer"
-                            >
-                                {/* Image Wrapper */}
-                                <div className="relative aspect-[4/5] bg-gray-50 overflow-hidden">
-                                    {product.imageUrl ? (
-                                        <Image
-                                            src={product.imageUrl}
-                                            alt={product.name}
-                                            fill
-                                            className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-                                            No Image
-                                        </div>
-                                    )}
-                                    {/* Dynamic Overlays */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="space-y-12">
+                        {/* Category Explorer Tabs */}
+                        <div className="w-full">
+                            <div className="flex flex-nowrap overflow-x-auto gap-4 pb-4 scrollbar-hide">
+                                {categories.map(category => (
+                                    <button
+                                        key={category.id}
+                                        onClick={() => {
+                                            setActiveCategoryId(category.id);
+                                            if (category.subCategories && category.subCategories.length > 0) {
+                                                setActiveSubCategoryId(category.subCategories[0].id);
+                                            } else {
+                                                setActiveSubCategoryId(null);
+                                            }
+                                        }}
+                                        className={`flex-shrink-0 px-8 py-3 rounded-full text-sm font-black tracking-wide uppercase transition-all duration-300 ${activeCategoryId === category.id
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                                                : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-900 border border-transparent'
+                                            }`}
+                                    >
+                                        {category.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
 
-                                    {/* Badge placeholder (dynamic based on DB logic eventually) */}
-                                    <div className="absolute top-4 left-4 flex gap-2">
-                                        <span
-                                            className={`bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md`}
-                                        >
-                                            Trending
-                                        </span>
-                                    </div>
+                        {/* SubCategory Pills */}
+                        {activeCategory && activeCategory.subCategories && activeCategory.subCategories.length > 0 && (
+                            <div className="flex flex-wrap gap-3 pb-4 border-b border-gray-100">
+                                {activeCategory.subCategories.map((sub: SubCategoryDTO) => (
+                                    <button
+                                        key={sub.id}
+                                        onClick={() => setActiveSubCategoryId(sub.id)}
+                                        className={`px-5 py-2 rounded-2xl text-xs font-bold transition-all duration-300 border ${activeSubCategoryId === sub.id
+                                                ? 'bg-black text-white border-black'
+                                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        {sub.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
 
-                                    {/* Quick Actions */}
-                                    <div className="absolute top-4 right-4 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500 flex flex-col gap-2">
-                                        <button className="w-10 h-10 bg-white shadow-xl rounded-2xl flex items-center justify-center hover:bg-black hover:text-white transition-colors">
-                                            <Heart className="w-4.5 h-4.5" />
-                                        </button>
-                                        <button className="w-10 h-10 bg-white shadow-xl rounded-2xl flex items-center justify-center hover:bg-black hover:text-white transition-colors">
-                                            <ShoppingCart className="w-4.5 h-4.5" />
-                                        </button>
-                                    </div>
+                        {/* Dynamic Product Grid */}
+                        <div className="min-h-[400px]">
+                            {loadingProducts ? (
+                                <div className="flex justify-center items-center py-20 h-full">
+                                    <Loader2 className="w-8 h-8 text-black animate-spin" />
                                 </div>
-
-                                {/* Detailed Info */}
-                                <div className="p-6 md:p-8">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <p className="text-xs text-blue-600 font-black uppercase tracking-widest">{product.category}</p>
-                                        <div className="flex items-center gap-1">
-                                            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                                            {/* Rating placeholder since backend doesn't support it yet */}
-                                            <span className="text-xs font-bold text-gray-900">4.5</span>
-                                        </div>
-                                    </div>
-
-                                    <h3 className="font-black text-gray-900 text-lg mb-4 leading-tight group-hover:text-blue-600 transition-colors tracking-tight line-clamp-2 h-12">{product.name}</h3>
-
-                                    <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-                                        <div className="flex flex-col">
-                                            {/* Original price placeholder logic */}
-                                            <span className="text-sm text-gray-400 font-bold line-through tracking-tight">${(product.price * 1.2).toFixed(2)}</span>
-                                            <span className="text-2xl font-black text-gray-900 tracking-tight">${product.price.toFixed(2)}</span>
-                                        </div>
-                                        <button className="bg-black text-white text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl hover:bg-blue-600 hover:shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)] transition-all duration-300">
-                                            Add to Cart
-                                        </button>
-                                    </div>
+                            ) : products.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-20 h-full text-center">
+                                    <h3 className="text-xl font-bold mb-2">No products found</h3>
+                                    <p className="text-gray-500 max-w-sm">We are restocking our inventory. Check back soon for amazing items in this category!</p>
                                 </div>
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                            ) : (
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={activeSubCategoryId || "empty"}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.4 }}
+                                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+                                    >
+                                        {products.map((product, i) => (
+                                            <motion.div
+                                                key={product.id}
+                                                variants={fadeUp}
+                                                custom={i}
+                                                whileHover={{ y: -12 }}
+                                                className="group relative bg-white/70 backdrop-blur-sm rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] transition-all duration-500 cursor-pointer flex flex-col h-full"
+                                            >
+                                                {/* Image Wrapper */}
+                                                <div className="relative aspect-[4/5] bg-gray-50 overflow-hidden flex-shrink-0">
+                                                    {product.imageUrl ? (
+                                                        <Image
+                                                            src={product.imageUrl}
+                                                            alt={product.name}
+                                                            fill
+                                                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                                                            No Image
+                                                        </div>
+                                                    )}
+                                                    {/* Dynamic Overlays */}
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                                    {/* Badge */}
+                                                    <div className="absolute top-4 left-4 flex gap-2">
+                                                        <span className={`bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md`}>
+                                                            {product.stockQuantity > 0 ? "Available" : "Sold Out"}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Quick Actions */}
+                                                    <div className="absolute top-4 right-4 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500 flex flex-col gap-2">
+                                                        <button className="w-10 h-10 bg-white shadow-xl rounded-2xl flex items-center justify-center hover:bg-black hover:text-white transition-colors">
+                                                            <Heart className="w-4.5 h-4.5" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Detailed Info */}
+                                                <div className="p-6 md:p-8 flex flex-col flex-grow">
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <p className="text-xs text-blue-600 font-black uppercase tracking-widest">{product.category}</p>
+                                                        <div className="flex items-center gap-1">
+                                                            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                                                            <span className="text-xs font-bold text-gray-900">4.5</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <h3 className="font-black text-gray-900 text-lg mb-4 leading-tight group-hover:text-blue-600 transition-colors tracking-tight line-clamp-2 min-h-[50px]">{product.name}</h3>
+
+                                                    <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-2xl font-black text-gray-900 tracking-tight">${product.price.toFixed(2)}</span>
+                                                        </div>
+                                                        <button
+                                                            onClick={async (e) => {
+                                                                e.stopPropagation();
+                                                                try {
+                                                                    await addToCart(product.id, 1);
+                                                                    alert("Added to Cart Successfully!");
+                                                                } catch (err) {
+                                                                    const error = err as Error;
+                                                                    alert("Failed to add to cart: " + error.message);
+                                                                }
+                                                            }}
+                                                            disabled={product.stockQuantity <= 0}
+                                                            className="bg-black text-white text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl hover:bg-blue-600 hover:shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                            {product.stockQuantity > 0 ? "Add to Cart" : "Out of Stock"}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </motion.div>
+                                </AnimatePresence>
+                            )}
+                        </div>
+                    </div>
                 )}
 
                 {/* Mobile view all */}
-                {products.length > 0 && (
+                {categories.length > 0 && (
                     <div className="mt-8 text-center sm:hidden">
                         <Link
                             href="/menu"

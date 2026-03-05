@@ -1,13 +1,19 @@
 package com.emart.ecommerce.repository;
 
+import com.emart.ecommerce.entity.Cart;
 import com.emart.ecommerce.entity.CartItem;
-import com.emart.ecommerce.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
-    List<CartItem> findByUser(User user);
+    List<CartItem> findByCart(Cart cart);
 
-    void deleteByUser(User user);
+    void deleteByCart(Cart cart);
+
+    List<CartItem> findByProductId(Long productId);
+
+    void deleteByProductId(Long productId);
 }

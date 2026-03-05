@@ -38,24 +38,33 @@ public class ProductController {
         return productService.getProductsByCategory(category);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Product> addProduct(@RequestBody Product product) {
         return new ResponseEntity<>(productService.addProduct(product), HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
         return ResponseEntity.ok(productService.updateProduct(id, product));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         productService.deleteProduct(id);
         auditService.log("DELETE_PRODUCT", username, "Deleted product ID: " + id);
         return ResponseEntity.ok("Product deleted successfully");
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @DeleteMapping("/clear")
+    public ResponseEntity<String> deleteAllProducts() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        productService.deleteAllProducts();
+        auditService.log("DELETE_ALL_PRODUCTS", username, "Deleted all products to clean workspace");
+        return ResponseEntity.ok("All dummy products cleared successfully");
     }
 }

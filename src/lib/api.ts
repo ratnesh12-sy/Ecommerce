@@ -13,6 +13,9 @@ export async function apiFetch<T>(
     const token =
         typeof window !== "undefined" ? localStorage.getItem("emart_token") : null;
 
+    // Temporary debug logging — remove after verifying token flow
+    console.log(`[apiFetch] ${options.method || "GET"} ${path} | Token attached: ${!!token}`);
+
     const headers: HeadersInit = {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -25,6 +28,17 @@ export async function apiFetch<T>(
     });
 
     if (!response.ok) {
+        // Explicit 401 / 403 handling for clear debugging
+        if (response.status === 401) {
+            console.warn(`[apiFetch] 401 Unauthorized on ${path} — token may be missing or expired.`);
+            if (typeof window !== "undefined") localStorage.removeItem("emart_token");
+            throw new Error("Unauthorized (401): Please log in again.");
+        }
+        if (response.status === 403) {
+            console.warn(`[apiFetch] 403 Forbidden on ${path} — insufficient permissions.`);
+            throw new Error("Forbidden (403): You do not have permission for this action.");
+        }
+
         let errorMessage = `Request failed with status ${response.status}`;
         try {
             const errorBody = await response.text();
@@ -142,7 +156,31 @@ export function updateUserRolesAdmin(userId: number, roles: string[]): Promise<U
     });
 }
 
-// ─── Products API ──────────────────────────────────────────
+// ─── Products & Categories API ───────────────────────────────
+
+export interface SubCategoryDTO {
+    id: number;
+    name: string;
+    categoryId: number;
+}
+
+export interface CategoryDTO {
+    id: number;
+    name: string;
+    subCategories: SubCategoryDTO[];
+}
+
+export function getAllCategoriesAPI(): Promise<CategoryDTO[]> {
+    return apiFetch<CategoryDTO[]>("/api/categories");
+}
+
+export function getSubCategoriesAPI(categoryId: number): Promise<SubCategoryDTO[]> {
+    return apiFetch<SubCategoryDTO[]>(`/api/categories/${categoryId}/subcategories`);
+}
+
+export function getProductsBySubCategoryAPI(subCategoryId: number): Promise<ProductResponse[]> {
+    return apiFetch<ProductResponse[]>(`/api/subcategories/${subCategoryId}/products`);
+}
 
 export interface ProductResponse {
     id: number;
@@ -151,10 +189,69 @@ export interface ProductResponse {
     price: number;
     stockQuantity: number;
     category: string;
+    categoryName?: string;
+    subCategoryName?: string;
     imageUrl: string;
 }
 
 /** Get all products */
 export function getAllProducts(): Promise<ProductResponse[]> {
     return apiFetch<ProductResponse[]>("/api/products");
+}
+
+export interface AddProductRequest {
+    name: string;
+    description: string;
+    price: number;
+    stockQuantity: number;
+    categoryName: string;
+    subCategoryName: string;
+    imageUrl: string;
+}
+
+export function addProductAPI(product: AddProductRequest): Promise<ProductResponse> {
+    return apiFetch<ProductResponse>("/api/products", {
+        method: "POST",
+        body: JSON.stringify(product),
+    });
+}
+
+// ─── Cart API ──────────────────────────────────────────────
+
+export interface CartItemResponse {
+    id: number;
+    productId: number;
+    productName: string;
+    imageUrl: string;
+    quantity: number;
+    priceAtTime: number;
+    itemTotal: number;
+}
+
+export interface CartResponse {
+    items: CartItemResponse[];
+    subtotal: number;
+    totalItems: number;
+}
+
+export function addToCartAPI(productId: number, quantity: number = 1): Promise<CartResponse> {
+    return apiFetch<CartResponse>(`/api/cart/add/${productId}?quantity=${quantity}`, {
+        method: "POST",
+    });
+}
+
+export function getCartAPI(): Promise<CartResponse> {
+    return apiFetch<CartResponse>("/api/cart");
+}
+
+export function updateCartItemAPI(itemId: number, quantity: number): Promise<CartResponse> {
+    return apiFetch<CartResponse>(`/api/cart/update/${itemId}?quantity=${quantity}`, {
+        method: "PUT",
+    });
+}
+
+export function removeFromCartAPI(itemId: number): Promise<CartResponse> {
+    return apiFetch<CartResponse>(`/api/cart/remove/${itemId}`, {
+        method: "DELETE",
+    });
 }

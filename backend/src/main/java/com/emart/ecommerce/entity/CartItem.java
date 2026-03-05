@@ -11,8 +11,8 @@ public class CartItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "cart_id", nullable = false)
+    private Cart cart;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
@@ -21,14 +21,18 @@ public class CartItem {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Column(name = "price_at_time", nullable = false)
+    private java.math.BigDecimal priceAtTime;
+
     public CartItem() {
     }
 
-    public CartItem(Long id, User user, Product product, Integer quantity) {
+    public CartItem(Long id, Cart cart, Product product, Integer quantity, java.math.BigDecimal priceAtTime) {
         this.id = id;
-        this.user = user;
+        this.cart = cart;
         this.product = product;
         this.quantity = quantity;
+        this.priceAtTime = priceAtTime;
     }
 
     public Long getId() {
@@ -39,12 +43,12 @@ public class CartItem {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public Cart getCart() {
+        return cart;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCart(Cart cart) {
+        this.cart = cart;
     }
 
     public Product getProduct() {
@@ -61,5 +65,13 @@ public class CartItem {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public java.math.BigDecimal getPriceAtTime() {
+        return priceAtTime;
+    }
+
+    public void setPriceAtTime(java.math.BigDecimal priceAtTime) {
+        this.priceAtTime = priceAtTime;
     }
 }

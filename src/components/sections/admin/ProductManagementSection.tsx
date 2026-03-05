@@ -1,19 +1,68 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState } from "react";
-import { Search, Plus, Package, Box, AlertTriangle, DollarSign, LayoutGrid, List } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, Plus, Package, Box, AlertTriangle, DollarSign, LayoutGrid, List, Loader2, X } from "lucide-react";
+import { getAllProducts, addProductAPI, ProductResponse } from "@/lib/api";
 
 export default function ProductManagementSection() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [searchTerm, setSearchTerm] = useState("");
+    const [products, setProducts] = useState<ProductResponse[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    // Dummy data to match Figma visual
-    const products = [
-        { id: 1, name: "Wireless Headphones", sku: "WH-2023-BK", price: 129.99, stock: 45, status: "In Stock" },
-        { id: 2, name: "Smart Watch Pro", sku: "SW-PRO-S1", price: 299.50, stock: 12, status: "Low Stock" },
-        { id: 3, name: "Mechanical Keyboard", sku: "MK-104-BL", price: 159.00, stock: 85, status: "In Stock" },
-        { id: 4, name: "Ergonomic Mouse", sku: "EM-WIRE-01", price: 49.99, stock: 0, status: "Out of Stock" }
-    ];
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "",
+        description: "",
+        price: "",
+        stockQuantity: "",
+        categoryName: "Electronics",
+        subCategoryName: "Laptops",
+        imageUrl: ""
+    });
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const data = await getAllProducts();
+            setProducts(data || []);
+            setError(null);
+        } catch (err) {
+            const e = err as Error;
+            setError(e.message || "Failed to load products");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAddProduct = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            setSubmitting(true);
+            const payload = {
+                ...formData,
+                price: parseFloat(formData.price) || 0,
+                stockQuantity: parseInt(formData.stockQuantity) || 0,
+            };
+            await addProductAPI(payload);
+            await fetchProducts(); // Refresh list
+            setIsModalOpen(false); // Close Modal
+            setFormData({ name: "", description: "", price: "", stockQuantity: "", categoryName: "Electronics", subCategoryName: "Laptops", imageUrl: "" }); // Reset
+        } catch (err) {
+            const e = err as Error;
+            alert(`Failed to add product: ${e.message}`);
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     return (
         <>
@@ -22,7 +71,10 @@ export default function ProductManagementSection() {
                     <h1 className="text-[28px] font-bold text-gray-900 tracking-tight leading-none mb-2">Products</h1>
                     <p className="text-[#6B7280] font-medium text-[15px]">Manage your product inventory</p>
                 </div>
-                <button className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-md shadow-purple-500/20 text-[15px]">
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-md shadow-purple-500/20 text-[15px]"
+                >
                     <Plus className="w-5 h-5" />
                     Add Product
                 </button>
@@ -108,14 +160,29 @@ export default function ProductManagementSection() {
             </div>
 
             {/* Content Area Based on View Mode */}
-            {viewMode === "list" ? (
+            {loading ? (
+                <div className="flex justify-center items-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+                    <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+                </div>
+            ) : error ? (
+                <div className="flex justify-center flex-col items-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm text-red-500">
+                    <AlertTriangle className="w-10 h-10 mb-4" />
+                    <p className="font-bold">{error}</p>
+                </div>
+            ) : products.length === 0 ? (
+                <div className="flex justify-center flex-col items-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm text-gray-500">
+                    <Package className="w-12 h-12 mb-4 text-gray-300" />
+                    <p className="font-bold text-lg text-gray-900">No products found</p>
+                    <p className="text-sm">Click &quot;Add Product&quot; to get started.</p>
+                </div>
+            ) : viewMode === "list" ? (
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-100">
                             <thead className="bg-gray-50/50">
                                 <tr>
                                     <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest">Product</th>
-                                    <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest">SKU</th>
+                                    <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest">Category</th>
                                     <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest">Price</th>
                                     <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest">Status / Stock</th>
                                 </tr>
@@ -123,24 +190,30 @@ export default function ProductManagementSection() {
                             <tbody className="bg-white divide-y divide-gray-50">
                                 {products.map((p) => (
                                     <tr key={p.id} className="hover:bg-gray-50/30 transition-colors">
-                                        <td className="px-8 py-5 whitespace-nowrap">
+                                        <td className="px-8 py-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400">
-                                                    <Box className="w-6 h-6" />
+                                                <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400 overflow-hidden relative">
+                                                    {p.imageUrl ? (
+                                                        <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Box className="w-6 h-6" />
+                                                    )}
                                                 </div>
-                                                <div className="text-[15px] font-bold text-gray-900">{p.name}</div>
+                                                <div className="text-[15px] font-bold text-gray-900 max-w-[200px] truncate" title={p.name}>{p.name}</div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5 whitespace-nowrap text-[14px] text-gray-500 font-medium">{p.sku}</td>
+                                        <td className="px-8 py-5 whitespace-nowrap text-[14px] text-gray-500 font-medium">
+                                            {p.category}
+                                        </td>
                                         <td className="px-8 py-5 whitespace-nowrap text-[15px] font-bold text-gray-900">${p.price.toFixed(2)}</td>
                                         <td className="px-8 py-5">
                                             <div className="flex flex-col gap-1">
-                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold self-start ${p.stock > 20 ? 'bg-emerald-50 text-emerald-600' :
-                                                    p.stock > 0 ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
+                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold self-start ${p.stockQuantity > 20 ? 'bg-emerald-50 text-emerald-600' :
+                                                    p.stockQuantity > 0 ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
                                                     }`}>
-                                                    {p.status}
+                                                    {p.stockQuantity > 20 ? "In Stock" : p.stockQuantity > 0 ? "Low Stock" : "Out of Stock"}
                                                 </span>
-                                                <span className="text-[12px] text-gray-400 font-medium ml-1">{p.stock} in stock</span>
+                                                <span className="text-[12px] text-gray-400 font-medium ml-1">{p.stockQuantity} in stock</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -154,21 +227,108 @@ export default function ProductManagementSection() {
                     {/* Grid View */}
                     {products.map((p) => (
                         <div key={p.id} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                            <div className="w-full h-40 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
-                                <Box className="w-12 h-12 text-gray-300" />
+                            <div className="w-full h-40 bg-gray-50 rounded-2xl flex items-center justify-center mb-4 overflow-hidden relative">
+                                {p.imageUrl ? (
+                                    <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <Box className="w-12 h-12 text-gray-300" />
+                                )}
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-1">{p.name}</h3>
-                            <p className="text-sm text-gray-500 font-medium mb-4">{p.sku}</p>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1 truncate" title={p.name}>{p.name}</h3>
+                            <p className="text-sm text-gray-500 font-medium mb-4">{p.category}</p>
                             <div className="flex items-center justify-between mt-auto">
                                 <span className="text-xl font-bold text-gray-900">${p.price.toFixed(2)}</span>
-                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${p.stock > 20 ? 'bg-emerald-50 text-emerald-600' :
-                                    p.stock > 0 ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
+                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${p.stockQuantity > 20 ? 'bg-emerald-50 text-emerald-600' :
+                                    p.stockQuantity > 0 ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
                                     }`}>
-                                    {p.status}
+                                    {p.stockQuantity > 20 ? "In Stock" : p.stockQuantity > 0 ? "Low Stock" : "Out of Stock"}
                                 </span>
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Slide-over Modal for Add Product */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 overflow-hidden">
+                    <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" onClick={() => setIsModalOpen(false)} />
+                    <div className="fixed inset-y-0 right-0 max-w-md w-full flex bg-white shadow-2xl transform transition-transform duration-300 ease-in-out translate-x-0">
+                        <div className="h-full flex flex-col w-full">
+                            <div className="px-6 py-6 border-b border-gray-100 flex items-center justify-between bg-white">
+                                <h2 className="text-xl font-bold text-gray-900">Add New Product</h2>
+                                <button onClick={() => setIsModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto px-6 py-6">
+                                <form id="add-product-form" onSubmit={handleAddProduct} className="space-y-5">
+                                    <div>
+                                        <label className="block text-[13px] font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Product Name</label>
+                                        <input required type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all" placeholder="Enter product name"
+                                            value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[13px] font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Description</label>
+                                        <textarea required rows={3} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all resize-none" placeholder="Enter product description"
+                                            value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        ></textarea>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-[13px] font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Price ($)</label>
+                                            <input required type="text" inputMode="decimal" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all" placeholder="0.00"
+                                                value={formData.price} onChange={(e) => { const v = e.target.value; if (v === "" || /^\d*\.?\d*$/.test(v)) setFormData({ ...formData, price: v }); }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[13px] font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Stock Qty</label>
+                                            <input required type="text" inputMode="numeric" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all" placeholder="0"
+                                                value={formData.stockQuantity} onChange={(e) => { const v = e.target.value; if (v === "" || /^\d+$/.test(v)) setFormData({ ...formData, stockQuantity: v }); }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-[13px] font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Category</label>
+                                            <select required className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all bg-white"
+                                                value={formData.categoryName} onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
+                                            >
+                                                <option value="Electronics">Electronics</option>
+                                                <option value="Fashion">Fashion</option>
+                                                <option value="Home & Garden">Home & Garden</option>
+                                                <option value="Sports">Sports</option>
+                                                <option value="Accessories">Accessories</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[13px] font-bold text-gray-700 mb-1.5 uppercase tracking-wider">SubCategory</label>
+                                            <input required type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all bg-white" placeholder="e.g. Laptops"
+                                                value={formData.subCategoryName} onChange={(e) => setFormData({ ...formData, subCategoryName: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[13px] font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Image URL</label>
+                                        <input required type="url" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all" placeholder="https://example.com/image.jpg"
+                                            value={formData.imageUrl} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                                        />
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" form="add-product-form" disabled={submitting} className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors disabled:opacity-70 flex justify-center items-center">
+                                    {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Product"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </>

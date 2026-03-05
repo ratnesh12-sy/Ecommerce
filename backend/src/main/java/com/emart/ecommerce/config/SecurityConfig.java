@@ -55,15 +55,23 @@ public class SecurityConfig {
                 .headers(headers -> headers
                         .xssProtection(xss -> xss.disable()) // Usually handled by frontend frameworks, disabled here
                                                              // for modern config
-                        .contentSecurityPolicy(cps -> cps.policyDirectives("default-src 'self'"))
+                        .contentSecurityPolicy(cps -> cps.policyDirectives(
+                                "default-src 'self'; connect-src 'self' http://localhost:3000 http://localhost:8080; img-src 'self' data: https:;"))
                         .frameOptions(frame -> frame.deny())
                         .contentTypeOptions(contentType -> contentType.disable()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/products", "/api/products/**")
+                        .hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/products/**")
+                        .hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/products/**")
+                        .hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/**",
-                                "/api/categories/**")
+                        .requestMatchers("/api/cart", "/api/cart/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products", "/api/products/**",
+                                "/api/categories", "/api/categories/**", "/api/subcategories/**")
                         .permitAll()
                         .anyRequest().authenticated()) // Deny all other unauthenticated requests by default
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

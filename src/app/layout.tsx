@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Navbar from "@/components/layout/Navbar";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { AuthProvider } from "@/context/AuthContext";
+import { CartProvider } from "@/context/CartContext";
 
 const Footer = dynamic(() => import("@/components/layout/Footer"), {
   ssr: true,
@@ -36,12 +37,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900`}
       >
         <AuthProvider>
-          <Navbar />
-          <main className="page-fade-in">
-            {children}
-          </main>
-          <MobileBottomNav />
-          <Footer />
+          <CartProvider>
+            <Navbar />
+            <main className="page-fade-in">
+              {children}
+            </main>
+            <MobileBottomNav />
+            <Footer />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

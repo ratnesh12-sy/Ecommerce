@@ -4,11 +4,13 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Search, ShoppingCart, User, MapPin, Shield } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 
 const Navbar = () => {
     const { user, logout } = useAuth();
+    const { cart } = useCart();
     const pathname = usePathname();
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [location] = useState("Mumbai, India");
@@ -116,7 +118,7 @@ const Navbar = () => {
                         <Link href="/cart" className="hidden md:flex relative p-2 text-white/80 hover:text-white transition-colors group">
                             <ShoppingCart className="w-6 h-6" />
                             <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-extrabold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-blue-600 rounded-full group-hover:scale-110 transition-transform font-sans">
-                                0
+                                {cart?.totalItems || 0}
                             </span>
                         </Link>
                     </div>

@@ -1,6 +1,8 @@
 package com.emart.ecommerce.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
 
@@ -15,14 +17,27 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
     private BigDecimal price;
 
+    @Column(length = 1000)
     private String imageUrl;
 
-    private String category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sub_category_id")
+    @JsonIgnore
+    private SubCategory subCategory;
+
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String categoryName;
+
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String subCategoryName;
 
     @Column(nullable = false)
     private Integer stockQuantity;
@@ -30,14 +45,14 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long id, String name, String description, BigDecimal price, String imageUrl, String category,
+    public Product(Long id, String name, String description, BigDecimal price, String imageUrl, String categoryName,
             Integer stockQuantity) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
-        this.category = category;
+        this.categoryName = categoryName;
         this.stockQuantity = stockQuantity;
     }
 
@@ -81,12 +96,36 @@ public class Product {
         this.imageUrl = imageUrl;
     }
 
-    public String getCategory() {
-        return category;
+    public SubCategory getSubCategory() {
+        return subCategory;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setSubCategory(SubCategory subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getSubCategoryName() {
+        return subCategoryName;
+    }
+
+    public void setSubCategoryName(String subCategoryName) {
+        this.subCategoryName = subCategoryName;
+    }
+
+    @JsonProperty("category")
+    public String getCategoryString() {
+        if (subCategory != null && subCategory.getCategory() != null) {
+            return subCategory.getCategory().getName();
+        }
+        return null;
     }
 
     public Integer getStockQuantity() {

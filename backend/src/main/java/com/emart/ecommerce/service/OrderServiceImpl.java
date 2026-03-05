@@ -2,6 +2,7 @@ package com.emart.ecommerce.service;
 
 import com.emart.ecommerce.entity.*;
 import com.emart.ecommerce.repository.CartItemRepository;
+import com.emart.ecommerce.repository.CartRepository;
 import com.emart.ecommerce.repository.OrderRepository;
 import com.emart.ecommerce.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,16 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
+    private final CartRepository cartRepository;
     private final UserRepository userRepository;
 
     public OrderServiceImpl(OrderRepository orderRepository,
             CartItemRepository cartItemRepository,
+            CartRepository cartRepository,
             UserRepository userRepository) {
         this.orderRepository = orderRepository;
         this.cartItemRepository = cartItemRepository;
+        this.cartRepository = cartRepository;
         this.userRepository = userRepository;
     }
 
@@ -32,7 +36,11 @@ public class OrderServiceImpl implements OrderService {
     public Order placeOrder(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        List<CartItem> cartItems = cartItemRepository.findByUser(user);
+
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Cart is empty"));
+
+        List<CartItem> cartItems = cart.getItems();
 
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
@@ -51,7 +59,8 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrder(order);
             orderItem.setProduct(cartItem.getProduct());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPrice(cartItem.getProduct().getPrice());
+            orderItem.setPrice(
+                    cartItem.getPriceAtTime() != null ? cartItem.getPriceAtTime() : cartItem.getProduct().getPrice());
 
             orderItems.add(orderItem);
             totalAmount = totalAmount.add(orderItem.getPrice().multiply(new BigDecimal(orderItem.getQuantity())));
@@ -61,7 +70,10 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(totalAmount);
 
         Order savedOrder = orderRepository.save(order);
-        cartItemRepository.deleteByUser(user);
+
+        cartItemRepository.deleteByCart(cart);
+        cartItems.clear();
+        cartRepository.save(cart);
 
         return savedOrder;
     }
