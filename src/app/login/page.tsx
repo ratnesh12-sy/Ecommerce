@@ -7,14 +7,9 @@ import { Phone, Mail, ArrowRight, Loader2, ShieldCheck, RotateCcw } from "lucide
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { auth } from "@/firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
-declare global {
-    interface Window {
-        recaptchaVerifier: RecaptchaVerifier | undefined;
-        confirmationResult: ConfirmationResult | undefined;
-    }
-}
+
 
 type AuthTab = "email" | "phone";
 type PhoneStep = "input" | "otp";

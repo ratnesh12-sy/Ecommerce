@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { getCartAPI, addToCartAPI, updateCartItemAPI, removeFromCartAPI, CartResponse } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
@@ -22,7 +22,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const refreshCart = async () => {
+    const refreshCart = useCallback(async () => {
         const token = typeof window !== "undefined" ? localStorage.getItem("emart_token") : null;
         if (!user || !token) {
             setCart(null);
@@ -48,12 +48,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         refreshCart();
-    }, [user]);
+    }, [refreshCart]);
 
     const addToCart = async (productId: number, quantity: number = 1) => {
         if (!user) {

@@ -2,8 +2,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Plus, Package, Box, AlertTriangle, DollarSign, LayoutGrid, List, Loader2, X } from "lucide-react";
-import { getAllProducts, addProductAPI, ProductResponse } from "@/lib/api";
+import { Search, Plus, Package, Box, AlertTriangle, DollarSign, LayoutGrid, List, Loader2, X, Edit2 } from "lucide-react";
+import { getAllProducts, addProductAPI, updateProductAPI, ProductResponse } from "@/lib/api";
 
 export default function ProductManagementSection() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -15,6 +15,7 @@ export default function ProductManagementSection() {
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<ProductResponse | null>(null);
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -24,6 +25,26 @@ export default function ProductManagementSection() {
         subCategoryName: "Laptops",
         imageUrl: ""
     });
+
+    const openModalForAdd = () => {
+        setEditingProduct(null);
+        setFormData({ name: "", description: "", price: "", stockQuantity: "", categoryName: "Electronics", subCategoryName: "Laptops", imageUrl: "" });
+        setIsModalOpen(true);
+    };
+
+    const openModalForEdit = (product: ProductResponse) => {
+        setEditingProduct(product);
+        setFormData({
+            name: product.name,
+            description: product.description,
+            price: product.price.toString(),
+            stockQuantity: product.stockQuantity.toString(),
+            categoryName: product.categoryName || product.category || "Electronics",
+            subCategoryName: product.subCategoryName || product.category || "Laptops",
+            imageUrl: product.imageUrl || ""
+        });
+        setIsModalOpen(true);
+    };
 
     useEffect(() => {
         fetchProducts();
@@ -43,7 +64,7 @@ export default function ProductManagementSection() {
         }
     };
 
-    const handleAddProduct = async (e: React.FormEvent) => {
+    const handleSaveProduct = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             setSubmitting(true);
@@ -52,13 +73,20 @@ export default function ProductManagementSection() {
                 price: parseFloat(formData.price) || 0,
                 stockQuantity: parseInt(formData.stockQuantity) || 0,
             };
-            await addProductAPI(payload);
+
+            if (editingProduct) {
+                await updateProductAPI(editingProduct.id, payload);
+            } else {
+                await addProductAPI(payload);
+            }
+
             await fetchProducts(); // Refresh list
             setIsModalOpen(false); // Close Modal
             setFormData({ name: "", description: "", price: "", stockQuantity: "", categoryName: "Electronics", subCategoryName: "Laptops", imageUrl: "" }); // Reset
+            setEditingProduct(null);
         } catch (err) {
             const e = err as Error;
-            alert(`Failed to add product: ${e.message}`);
+            alert(`Failed to save product: ${e.message}`);
         } finally {
             setSubmitting(false);
         }
@@ -72,7 +100,7 @@ export default function ProductManagementSection() {
                     <p className="text-[#6B7280] font-medium text-[15px]">Manage your product inventory</p>
                 </div>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={openModalForAdd}
                     className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-md shadow-purple-500/20 text-[15px]"
                 >
                     <Plus className="w-5 h-5" />
@@ -185,6 +213,7 @@ export default function ProductManagementSection() {
                                     <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest">Category</th>
                                     <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest">Price</th>
                                     <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest">Status / Stock</th>
+                                    <th className="px-8 py-5 text-right text-[11px] font-black text-gray-400 uppercase tracking-widest">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-50">
@@ -216,6 +245,11 @@ export default function ProductManagementSection() {
                                                 <span className="text-[12px] text-gray-400 font-medium ml-1">{p.stockQuantity} in stock</span>
                                             </div>
                                         </td>
+                                        <td className="px-8 py-5 text-right">
+                                            <button onClick={() => openModalForEdit(p)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors">
+                                                <Edit2 className="w-5 h-5" />
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -238,11 +272,16 @@ export default function ProductManagementSection() {
                             <p className="text-sm text-gray-500 font-medium mb-4">{p.category}</p>
                             <div className="flex items-center justify-between mt-auto">
                                 <span className="text-xl font-bold text-gray-900">${p.price.toFixed(2)}</span>
-                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${p.stockQuantity > 20 ? 'bg-emerald-50 text-emerald-600' :
-                                    p.stockQuantity > 0 ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
-                                    }`}>
-                                    {p.stockQuantity > 20 ? "In Stock" : p.stockQuantity > 0 ? "Low Stock" : "Out of Stock"}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${p.stockQuantity > 20 ? 'bg-emerald-50 text-emerald-600' :
+                                        p.stockQuantity > 0 ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'
+                                        }`}>
+                                        {p.stockQuantity > 20 ? "In Stock" : p.stockQuantity > 0 ? "Low Stock" : "Out of Stock"}
+                                    </span>
+                                    <button onClick={() => openModalForEdit(p)} className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors ml-1">
+                                        <Edit2 className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -256,14 +295,14 @@ export default function ProductManagementSection() {
                     <div className="fixed inset-y-0 right-0 max-w-md w-full flex bg-white shadow-2xl transform transition-transform duration-300 ease-in-out translate-x-0">
                         <div className="h-full flex flex-col w-full">
                             <div className="px-6 py-6 border-b border-gray-100 flex items-center justify-between bg-white">
-                                <h2 className="text-xl font-bold text-gray-900">Add New Product</h2>
+                                <h2 className="text-xl font-bold text-gray-900">{editingProduct ? "Edit Product" : "Add New Product"}</h2>
                                 <button onClick={() => setIsModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
 
                             <div className="flex-1 overflow-y-auto px-6 py-6">
-                                <form id="add-product-form" onSubmit={handleAddProduct} className="space-y-5">
+                                <form id="add-product-form" onSubmit={handleSaveProduct} className="space-y-5">
                                     <div>
                                         <label className="block text-[13px] font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Product Name</label>
                                         <input required type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all" placeholder="Enter product name"

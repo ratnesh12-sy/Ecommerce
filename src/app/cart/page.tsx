@@ -90,7 +90,13 @@ export default function CartPage() {
                                                     {/* Quantity Controls */}
                                                     <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-xl p-1">
                                                         <button
-                                                            onClick={() => updateCartItem(item.id, item.quantity - 1)}
+                                                            onClick={() => {
+                                                                if (item.quantity <= 1) {
+                                                                    removeFromCart(item.id);
+                                                                } else {
+                                                                    updateCartItem(item.id, item.quantity - 1);
+                                                                }
+                                                            }}
                                                             className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-white hover:text-black hover:shadow-sm rounded-lg transition-all"
                                                         >
                                                             <Minus className="w-4 h-4" />

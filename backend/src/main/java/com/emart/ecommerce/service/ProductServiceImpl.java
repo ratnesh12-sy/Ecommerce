@@ -102,6 +102,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<Product> getLatestProducts() {
+        return productRepository.findTop12ByOrderByCreatedAtDesc();
+    }
+
+    @Override
     public void deleteAllProducts() {
         cartItemRepository.deleteAll();
         productRepository.deleteAll();

@@ -13,9 +13,6 @@ export async function apiFetch<T>(
     const token =
         typeof window !== "undefined" ? localStorage.getItem("emart_token") : null;
 
-    // Temporary debug logging — remove after verifying token flow
-    console.log(`[apiFetch] ${options.method || "GET"} ${path} | Token attached: ${!!token}`);
-
     const headers: HeadersInit = {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -199,6 +196,11 @@ export function getAllProducts(): Promise<ProductResponse[]> {
     return apiFetch<ProductResponse[]>("/api/products");
 }
 
+/** Get latest products */
+export function getLatestProductsAPI(): Promise<ProductResponse[]> {
+    return apiFetch<ProductResponse[]>("/api/products/latest");
+}
+
 export interface AddProductRequest {
     name: string;
     description: string;
@@ -212,6 +214,13 @@ export interface AddProductRequest {
 export function addProductAPI(product: AddProductRequest): Promise<ProductResponse> {
     return apiFetch<ProductResponse>("/api/products", {
         method: "POST",
+        body: JSON.stringify(product),
+    });
+}
+
+export function updateProductAPI(id: number, product: AddProductRequest): Promise<ProductResponse> {
+    return apiFetch<ProductResponse>(`/api/products/${id}`, {
+        method: "PUT",
         body: JSON.stringify(product),
     });
 }

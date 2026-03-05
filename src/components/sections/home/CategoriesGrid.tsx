@@ -3,25 +3,13 @@
 import React from "react";
 import { Smartphone, Shirt, Home, Gift, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
-
-const fadeUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i: number = 0) => ({
-        opacity: 1,
-        y: 0,
-        transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
-    }),
-};
-
-const stagger = {
-    visible: { transition: { staggerChildren: 0.08 } },
-};
+import { fadeUp, stagger } from "@/lib/animations";
 
 const categories = [
-    { icon: Smartphone, label: "Electronics", count: "2.4k Products", gradient: "from-blue-500 to-cyan-400" },
-    { icon: Shirt, label: "Fashion", count: "3.1k Products", gradient: "from-pink-500 to-rose-400" },
-    { icon: Home, label: "Home & Living", count: "1.8k Products", gradient: "from-orange-500 to-amber-400" },
-    { icon: Gift, label: "Beauty", count: "960 Products", gradient: "from-purple-500 to-violet-400" },
+    { icon: Smartphone, label: "Electronics", gradient: "from-blue-500 to-cyan-400" },
+    { icon: Shirt, label: "Fashion", gradient: "from-pink-500 to-rose-400" },
+    { icon: Home, label: "Home & Living", gradient: "from-orange-500 to-amber-400" },
+    { icon: Gift, label: "Beauty", gradient: "from-purple-500 to-violet-400" },
 ];
 
 export default function CategoriesGrid() {
@@ -75,8 +63,7 @@ export default function CategoriesGrid() {
                                 <cat.icon className="w-5 h-5 sm:w-8 sm:h-8 text-white" />
                             </div>
 
-                            <h3 className="font-black text-gray-900 text-[13px] sm:text-lg md:text-xl tracking-tight mb-1 sm:mb-2 group-hover:text-blue-600 transition-colors uppercase truncate">{cat.label}</h3>
-                            <p className="text-[10px] sm:text-xs md:text-sm text-gray-400 font-bold tracking-wide uppercase opacity-70 mb-2 sm:mb-8">{cat.count}</p>
+                            <h3 className="font-black text-gray-900 text-[13px] sm:text-lg md:text-xl tracking-tight mb-3 sm:mb-8 group-hover:text-blue-600 transition-colors uppercase truncate">{cat.label}</h3>
 
                             <div className="flex items-center gap-1 sm:gap-2 text-blue-600 font-black text-[9px] sm:text-[10px] md:text-xs uppercase tracking-widest opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transform translate-y-0 sm:translate-y-4 sm:group-hover:translate-y-0 transition-all duration-500">
                                 Explore <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />

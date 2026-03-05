@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
@@ -42,6 +43,9 @@ public class Product {
     @Column(nullable = false)
     private Integer stockQuantity;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
     public Product() {
     }
 
@@ -54,6 +58,11 @@ public class Product {
         this.imageUrl = imageUrl;
         this.categoryName = categoryName;
         this.stockQuantity = stockQuantity;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -134,5 +143,13 @@ public class Product {
 
     public void setStockQuantity(Integer stockQuantity) {
         this.stockQuantity = stockQuantity;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

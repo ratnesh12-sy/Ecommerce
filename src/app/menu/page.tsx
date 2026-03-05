@@ -18,17 +18,7 @@ import {
     Moon,
 } from "lucide-react";
 import { motion } from "framer-motion";
-
-const fadeUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i: number = 0) => ({
-        opacity: 1,
-        y: 0,
-        transition: { delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
-    }),
-};
-
-const stagger = { visible: { transition: { staggerChildren: 0.06 } } };
+import { fadeUpFast as fadeUp, staggerFast as stagger } from "@/lib/animations";
 
 const MenuPage = () => {
     const categories = [

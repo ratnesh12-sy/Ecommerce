@@ -33,6 +33,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
+    @GetMapping("/latest")
+    public List<Product> getLatestProducts() {
+        return productService.getLatestProducts();
+    }
+
     @GetMapping("/category/{category}")
     public List<Product> getProductsByCategory(@PathVariable String category) {
         return productService.getProductsByCategory(category);

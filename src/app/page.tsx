@@ -8,7 +8,8 @@ import StructuredData, {
 import HeroSection from "@/components/sections/home/HeroSection";
 import FeaturesStrip from "@/components/sections/home/FeaturesStrip";
 import CategoriesGrid from "@/components/sections/home/CategoriesGrid";
-import TrendingProducts from "@/components/sections/home/TrendingProducts";
+import ShopByCategory from "@/components/sections/home/ShopByCategory";
+import LatestArrivals from "@/components/sections/home/LatestArrivals";
 import PromoBanner from "@/components/sections/home/PromoBanner";
 import Newsletter from "@/components/sections/home/Newsletter";
 
@@ -21,7 +22,8 @@ export default function HomePage() {
       <HeroSection />
       <FeaturesStrip />
       <CategoriesGrid />
-      <TrendingProducts />
+      <LatestArrivals />
+      <ShopByCategory />
       <PromoBanner />
       <Newsletter />
     </div>

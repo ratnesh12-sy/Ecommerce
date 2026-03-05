@@ -13,21 +13,9 @@ import {
     ProductResponse
 } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
+import { fadeUp, stagger } from "@/lib/animations";
 
-const fadeUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i: number = 0) => ({
-        opacity: 1,
-        y: 0,
-        transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
-    }),
-};
-
-const stagger = {
-    visible: { transition: { staggerChildren: 0.08 } },
-};
-
-export default function TrendingProducts() {
+export default function ShopByCategory() {
     const { addToCart } = useCart();
 
     const [categories, setCategories] = useState<CategoryDTO[]>([]);
@@ -97,10 +85,10 @@ export default function TrendingProducts() {
                 >
                     <div className="text-left">
                         <motion.p variants={fadeUp} className="text-sm font-black text-blue-600 uppercase tracking-[0.25em] mb-3">
-                            Trending Now
+                            Shop by Category
                         </motion.p>
                         <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight">
-                            Latest <span className="text-gradient-premium">Arrivals</span>
+                            Browse <span className="text-gradient-premium">Collections</span>
                         </motion.h2>
                     </div>
                     <motion.div variants={fadeUp} className="mt-6 md:mt-0">
@@ -142,8 +130,8 @@ export default function TrendingProducts() {
                                             }
                                         }}
                                         className={`flex-shrink-0 px-8 py-3 rounded-full text-sm font-black tracking-wide uppercase transition-all duration-300 ${activeCategoryId === category.id
-                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                                                : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-900 border border-transparent'
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                                            : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-900 border border-transparent'
                                             }`}
                                     >
                                         {category.name}
@@ -160,8 +148,8 @@ export default function TrendingProducts() {
                                         key={sub.id}
                                         onClick={() => setActiveSubCategoryId(sub.id)}
                                         className={`px-5 py-2 rounded-2xl text-xs font-bold transition-all duration-300 border ${activeSubCategoryId === sub.id
-                                                ? 'bg-black text-white border-black'
-                                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                            ? 'bg-black text-white border-black'
+                                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                                             }`}
                                     >
                                         {sub.name}
