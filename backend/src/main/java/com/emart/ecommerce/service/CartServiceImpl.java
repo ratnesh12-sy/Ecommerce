@@ -77,8 +77,10 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (product.getStockQuantity() < quantity) {
-            throw new RuntimeException("Insufficient stock for product: " + product.getName());
+        Integer stock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+        if (stock < quantity) {
+            throw new RuntimeException(
+                    "Insufficient stock for product: " + product.getName() + " (Stock: " + stock + ")");
         }
 
         Optional<CartItem> existingItemOptional = cart.getItems().stream()
@@ -88,8 +90,9 @@ public class CartServiceImpl implements CartService {
         if (existingItemOptional.isPresent()) {
             CartItem existingItem = existingItemOptional.get();
             int newQuantity = existingItem.getQuantity() + quantity;
-            if (product.getStockQuantity() < newQuantity) {
-                throw new RuntimeException("Insufficient stock to add more of: " + product.getName());
+            if (stock < newQuantity) {
+                throw new RuntimeException(
+                        "Insufficient stock to add more of: " + product.getName() + " (Stock: " + stock + ")");
             }
             existingItem.setQuantity(newQuantity);
             existingItem.setPriceAtTime(product.getPrice());
@@ -130,8 +133,10 @@ public class CartServiceImpl implements CartService {
             cart.getItems().remove(item);
             cartItemRepository.delete(item);
         } else {
-            if (item.getProduct().getStockQuantity() < quantity) {
-                throw new RuntimeException("Insufficient stock for product: " + item.getProduct().getName());
+            Integer stock = item.getProduct().getStockQuantity() != null ? item.getProduct().getStockQuantity() : 0;
+            if (stock < quantity) {
+                throw new RuntimeException(
+                        "Insufficient stock for product: " + item.getProduct().getName() + " (Stock: " + stock + ")");
             }
             item.setQuantity(quantity);
             // Optional: Update price to latest or keep the old one? Usually we can keep

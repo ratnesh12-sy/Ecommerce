@@ -1,15 +1,16 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Smartphone, Shirt, Home, Gift, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { fadeUp, stagger } from "@/lib/animations";
 
 const categories = [
-    { icon: Smartphone, label: "Electronics", gradient: "from-blue-500 to-cyan-400" },
-    { icon: Shirt, label: "Fashion", gradient: "from-pink-500 to-rose-400" },
-    { icon: Home, label: "Home & Living", gradient: "from-orange-500 to-amber-400" },
-    { icon: Gift, label: "Beauty", gradient: "from-purple-500 to-violet-400" },
+    { icon: Smartphone, label: "Electronics", gradient: "from-blue-500 to-cyan-400", id: 1 },
+    { icon: Shirt, label: "Fashion", gradient: "from-pink-500 to-rose-400", id: 3 },
+    { icon: Home, label: "Home & Living", gradient: "from-orange-500 to-amber-400", id: 4 },
+    { icon: Gift, label: "Beauty", gradient: "from-purple-500 to-violet-400", id: 2 },
 ];
 
 export default function CategoriesGrid() {
@@ -47,28 +48,29 @@ export default function CategoriesGrid() {
                     className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-8"
                 >
                     {categories.map((cat, i) => (
-                        <motion.div
-                            key={cat.label}
-                            variants={fadeUp}
-                            custom={i}
-                            whileHover={{ y: -8 }}
-                            className="group relative bg-gray-50/50 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8 md:p-10 border border-transparent hover:border-blue-100 hover:bg-white transition-all duration-500 cursor-pointer overflow-hidden shadow-sm hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)]"
-                        >
-                            {/* Hover Gradient Border Effect */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-transparent to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500" />
-
-                            <div
-                                className={`w-10 h-10 sm:w-16 sm:h-16 rounded-xl sm:rounded-3xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-4 sm:mb-8 shadow-xl shadow-blue-500/20 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}
+                        <Link href={`/category?id=${cat.id}`} key={cat.label}>
+                            <motion.div
+                                variants={fadeUp}
+                                custom={i}
+                                whileHover={{ y: -8 }}
+                                className="group relative bg-gray-50/50 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8 md:p-10 border border-transparent hover:border-blue-100 hover:bg-white transition-all duration-500 cursor-pointer overflow-hidden shadow-sm hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] h-full"
                             >
-                                <cat.icon className="w-5 h-5 sm:w-8 sm:h-8 text-white" />
-                            </div>
+                                {/* Hover Gradient Border Effect */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-transparent to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500" />
 
-                            <h3 className="font-black text-gray-900 text-[13px] sm:text-lg md:text-xl tracking-tight mb-3 sm:mb-8 group-hover:text-blue-600 transition-colors uppercase truncate">{cat.label}</h3>
+                                <div
+                                    className={`w-10 h-10 sm:w-16 sm:h-16 rounded-xl sm:rounded-3xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-4 sm:mb-8 shadow-xl shadow-blue-500/20 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}
+                                >
+                                    <cat.icon className="w-5 h-5 sm:w-8 sm:h-8 text-white" />
+                                </div>
 
-                            <div className="flex items-center gap-1 sm:gap-2 text-blue-600 font-black text-[9px] sm:text-[10px] md:text-xs uppercase tracking-widest opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transform translate-y-0 sm:translate-y-4 sm:group-hover:translate-y-0 transition-all duration-500">
-                                Explore <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
-                            </div>
-                        </motion.div>
+                                <h3 className="font-black text-gray-900 text-[13px] sm:text-lg md:text-xl tracking-tight mb-3 sm:mb-8 group-hover:text-blue-600 transition-colors uppercase truncate">{cat.label}</h3>
+
+                                <div className="flex items-center gap-1 sm:gap-2 text-blue-600 font-black text-[9px] sm:text-[10px] md:text-xs uppercase tracking-widest opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transform translate-y-0 sm:translate-y-4 sm:group-hover:translate-y-0 transition-all duration-500">
+                                    Explore <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+                                </div>
+                            </motion.div>
+                        </Link>
                     ))}
                 </motion.div>
             </div>

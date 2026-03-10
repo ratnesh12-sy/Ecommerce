@@ -3,12 +3,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Search, Plus, Package, Box, AlertTriangle, DollarSign, LayoutGrid, List, Loader2, X, Edit2 } from "lucide-react";
-import { getAllProducts, addProductAPI, updateProductAPI, ProductResponse } from "@/lib/api";
+import { getAllProducts, addProductAPI, updateProductAPI, getAllCategoriesAPI, ProductResponse, CategoryDTO, SubCategoryDTO } from "@/lib/api";
 
 export default function ProductManagementSection() {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [searchTerm, setSearchTerm] = useState("");
     const [products, setProducts] = useState<ProductResponse[]>([]);
+    const [categories, setCategories] = useState<CategoryDTO[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -21,14 +22,14 @@ export default function ProductManagementSection() {
         description: "",
         price: "",
         stockQuantity: "",
-        categoryName: "Electronics",
-        subCategoryName: "Laptops",
+        categoryId: 1,
+        subCategoryId: 1,
         imageUrl: ""
     });
 
     const openModalForAdd = () => {
         setEditingProduct(null);
-        setFormData({ name: "", description: "", price: "", stockQuantity: "", categoryName: "Electronics", subCategoryName: "Laptops", imageUrl: "" });
+        setFormData({ name: "", description: "", price: "", stockQuantity: "", categoryId: categories[0]?.id || 1, subCategoryId: categories[0]?.subCategories[0]?.id || 1, imageUrl: "" });
         setIsModalOpen(true);
     };
 
@@ -39,26 +40,30 @@ export default function ProductManagementSection() {
             description: product.description,
             price: product.price.toString(),
             stockQuantity: product.stockQuantity.toString(),
-            categoryName: product.categoryName || product.category || "Electronics",
-            subCategoryName: product.subCategoryName || product.category || "Laptops",
+            categoryId: categories[0]?.id || 1, // Need to find matching ID in a real app or keep it simple
+            subCategoryId: categories[0]?.subCategories[0]?.id || 1,
             imageUrl: product.imageUrl || ""
         });
         setIsModalOpen(true);
     };
 
     useEffect(() => {
-        fetchProducts();
+        fetchProductsAndCategories();
     }, []);
 
-    const fetchProducts = async () => {
+    const fetchProductsAndCategories = async () => {
         try {
             setLoading(true);
-            const data = await getAllProducts();
-            setProducts(data || []);
+            const [prodData, catData] = await Promise.all([
+                getAllProducts(),
+                getAllCategoriesAPI()
+            ]);
+            setProducts(prodData || []);
+            setCategories(catData || []);
             setError(null);
         } catch (err) {
             const e = err as Error;
-            setError(e.message || "Failed to load products");
+            setError(e.message || "Failed to load products and categories");
         } finally {
             setLoading(false);
         }
@@ -72,6 +77,8 @@ export default function ProductManagementSection() {
                 ...formData,
                 price: parseFloat(formData.price) || 0,
                 stockQuantity: parseInt(formData.stockQuantity) || 0,
+                categoryId: Number(formData.categoryId),
+                subCategoryId: Number(formData.subCategoryId),
             };
 
             if (editingProduct) {
@@ -80,9 +87,9 @@ export default function ProductManagementSection() {
                 await addProductAPI(payload);
             }
 
-            await fetchProducts(); // Refresh list
+            await fetchProductsAndCategories(); // Refresh list
             setIsModalOpen(false); // Close Modal
-            setFormData({ name: "", description: "", price: "", stockQuantity: "", categoryName: "Electronics", subCategoryName: "Laptops", imageUrl: "" }); // Reset
+            setFormData({ name: "", description: "", price: "", stockQuantity: "", categoryId: categories[0]?.id || 1, subCategoryId: categories[0]?.subCategories[0]?.id || 1, imageUrl: "" }); // Reset
             setEditingProduct(null);
         } catch (err) {
             const e = err as Error;
@@ -333,20 +340,32 @@ export default function ProductManagementSection() {
                                         <div>
                                             <label className="block text-[13px] font-bold text-gray-700 mb-1.5 uppercase tracking-wider">Category</label>
                                             <select required className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all bg-white"
-                                                value={formData.categoryName} onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
+                                                value={formData.categoryId}
+                                                onChange={(e) => {
+                                                    const catId = Number(e.target.value);
+                                                    const cat = categories.find(c => c.id === catId);
+                                                    setFormData({
+                                                        ...formData,
+                                                        categoryId: catId,
+                                                        subCategoryId: cat?.subCategories[0]?.id || 1
+                                                    });
+                                                }}
                                             >
-                                                <option value="Electronics">Electronics</option>
-                                                <option value="Fashion">Fashion</option>
-                                                <option value="Home & Garden">Home & Garden</option>
-                                                <option value="Sports">Sports</option>
-                                                <option value="Accessories">Accessories</option>
+                                                {categories.map(c => (
+                                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                                ))}
                                             </select>
                                         </div>
                                         <div>
                                             <label className="block text-[13px] font-bold text-gray-700 mb-1.5 uppercase tracking-wider">SubCategory</label>
-                                            <input required type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all bg-white" placeholder="e.g. Laptops"
-                                                value={formData.subCategoryName} onChange={(e) => setFormData({ ...formData, subCategoryName: e.target.value })}
-                                            />
+                                            <select required className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all bg-white"
+                                                value={formData.subCategoryId}
+                                                onChange={(e) => setFormData({ ...formData, subCategoryId: Number(e.target.value) })}
+                                            >
+                                                {categories.find(c => c.id === formData.categoryId)?.subCategories.map(s => (
+                                                    <option key={s.id} value={s.id}>{s.name}</option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
                                     <div>

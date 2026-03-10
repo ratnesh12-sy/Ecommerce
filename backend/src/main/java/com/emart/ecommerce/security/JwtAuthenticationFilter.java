@@ -30,20 +30,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = getJwtFromRequest(request);
 
-        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-            try {
-                String username = tokenProvider.getUsername(token);
-                java.util.Set<org.springframework.security.core.GrantedAuthority> authorities = tokenProvider
-                        .getRoles(token);
+        if (StringUtils.hasText(token)) {
+            if (tokenProvider.validateToken(token)) {
+                try {
+                    String username = tokenProvider.getUsername(token);
+                    java.util.Set<org.springframework.security.core.GrantedAuthority> authorities = tokenProvider
+                            .getRoles(token);
 
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        username, null, authorities);
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    System.out.println("JwtAuthenticationFilter: Authenticating user: " + username
+                            + " with authorities: " + authorities);
 
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            } catch (io.jsonwebtoken.JwtException e) {
-                System.err.println("JwtAuthenticationFilter: Failed to process JWT token: " + e.getMessage());
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            username, null, authorities);
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                } catch (Exception e) {
+                    System.err.println("JwtAuthenticationFilter: Error setting authentication: " + e.getMessage());
+                }
+            } else {
+                System.out.println("JwtAuthenticationFilter: Invalid token provided.");
             }
+        } else {
+            // Unauthenticated request
         }
 
         filterChain.doFilter(request, response);

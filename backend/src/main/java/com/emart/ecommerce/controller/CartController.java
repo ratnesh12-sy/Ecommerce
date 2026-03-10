@@ -17,13 +17,14 @@ public class CartController {
     }
 
     @PostMapping("/add/{productId}")
-    public ResponseEntity<CartResponseDTO> addToCart(@PathVariable Long productId,
+    public ResponseEntity<?> addToCart(@PathVariable Long productId,
             @RequestParam(defaultValue = "1") Integer quantity,
             Authentication authentication) {
         try {
             return ResponseEntity.ok(cartService.addToCart(productId, quantity, authentication.getName()));
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
+            System.err.println("Error adding to cart: " + e.getMessage());
+            return ResponseEntity.status(400).body(e.getMessage());
         }
     }
 

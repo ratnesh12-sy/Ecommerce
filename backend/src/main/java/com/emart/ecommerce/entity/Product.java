@@ -34,14 +34,14 @@ public class Product {
 
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String categoryName;
+    private Long categoryId;
 
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String subCategoryName;
+    private Long subCategoryId;
 
     @Column(nullable = false)
-    private Integer stockQuantity;
+    private Integer stockQuantity = 0;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -49,14 +49,16 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long id, String name, String description, BigDecimal price, String imageUrl, String categoryName,
+    public Product(Long id, String name, String description, BigDecimal price, String imageUrl, Long categoryId,
+            Long subCategoryId,
             Integer stockQuantity) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
-        this.categoryName = categoryName;
+        this.categoryId = categoryId;
+        this.subCategoryId = subCategoryId;
         this.stockQuantity = stockQuantity;
     }
 
@@ -113,20 +115,20 @@ public class Product {
         this.subCategory = subCategory;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public String getSubCategoryName() {
-        return subCategoryName;
+    public Long getSubCategoryId() {
+        return subCategoryId;
     }
 
-    public void setSubCategoryName(String subCategoryName) {
-        this.subCategoryName = subCategoryName;
+    public void setSubCategoryId(Long subCategoryId) {
+        this.subCategoryId = subCategoryId;
     }
 
     @JsonProperty("category")

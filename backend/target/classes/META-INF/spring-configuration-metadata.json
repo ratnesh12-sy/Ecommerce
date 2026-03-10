@@ -10,8 +10,7 @@
     {
       "name": "app.jwt.expiration-milliseconds",
       "type": "java.lang.Long",
-      "sourceType": "com.emart.ecommerce.security.JwtProperties",
-      "defaultValue": 0
+      "sourceType": "com.emart.ecommerce.security.JwtProperties"
     },
     {
       "name": "app.jwt.secret",

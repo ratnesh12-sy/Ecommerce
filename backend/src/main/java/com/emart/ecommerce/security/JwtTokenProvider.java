@@ -89,6 +89,7 @@ public class JwtTokenProvider {
             return ((java.util.Collection<?>) rolesObject)
                     .stream()
                     .map(Object::toString)
+                    .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
                     .map(org.springframework.security.core.authority.SimpleGrantedAuthority::new)
                     .collect(Collectors.toSet());
         }

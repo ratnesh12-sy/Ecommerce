@@ -179,6 +179,10 @@ export function getProductsBySubCategoryAPI(subCategoryId: number): Promise<Prod
     return apiFetch<ProductResponse[]>(`/api/subcategories/${subCategoryId}/products`);
 }
 
+export function getProductsByCategoryAPI(categoryName: string): Promise<ProductResponse[]> {
+    return apiFetch<ProductResponse[]>(`/api/products/category/${encodeURIComponent(categoryName)}`);
+}
+
 export interface ProductResponse {
     id: number;
     name: string;
@@ -206,8 +210,8 @@ export interface AddProductRequest {
     description: string;
     price: number;
     stockQuantity: number;
-    categoryName: string;
-    subCategoryName: string;
+    categoryId: number;
+    subCategoryId: number;
     imageUrl: string;
 }
 

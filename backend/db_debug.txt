@@ -1,0 +1,195 @@
+
+--- DataSeeder Session: 2026-03-06T15:21:45.417085300 ---
+DataSeeder: Set default for products.stock_quantity
+DataSeeder: Error dropping cart_items.stock_quantity: StatementCallback; bad SQL grammar [ALTER TABLE cart_items DROP COLUMN stock_quantity]
+--- Schema Debug ---
+Product Column: id
+Product Column: category
+Product Column: description
+Product Column: image_url
+Product Column: name
+Product Column: price
+Product Column: stock_quantity
+Product Column: sub_category_id
+Product Column: created_at
+CartItem Column: id
+CartItem Column: quantity
+CartItem Column: product_id
+CartItem Column: user_id
+CartItem Column: price_at_time
+CartItem Column: cart_id
+-------------------
+DataSeeder: Database is clean, no updates needed.
+
+--- Deep Schema Analysis: 2026-03-06T15:24:56.822581300 ---
+CREATE TABLE products:
+CREATE TABLE `products` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `category` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `image_url` varchar(1000) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `price` decimal(38,2) NOT NULL,
+  `stock_quantity` int NOT NULL DEFAULT '0',
+  `sub_category_id` bigint DEFAULT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKno5p9kcr384tg56cbk8l9l6h2` (`sub_category_id`),
+  CONSTRAINT `FKno5p9kcr384tg56cbk8l9l6h2` FOREIGN KEY (`sub_category_id`) REFERENCES `sub_categories` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+CREATE TABLE cart_items:
+CREATE TABLE `cart_items` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `quantity` int NOT NULL,
+  `product_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  `price_at_time` decimal(38,2) NOT NULL,
+  `cart_id` bigint NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK1re40cjegsfvw58xrkdp6bac6` (`product_id`),
+  KEY `FK709eickf3kc0dujx3ub9i7btf` (`user_id`),
+  KEY `FKpcttvuq4mxppo8sxggjtn5i2c` (`cart_id`),
+  CONSTRAINT `FK1re40cjegsfvw58xrkdp6bac6` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
+  CONSTRAINT `FK709eickf3kc0dujx3ub9i7btf` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `FKpcttvuq4mxppo8sxggjtn5i2c` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+DataSeeder: Forced products.stock_quantity default to 0
+
+--- Full Database Inventory: 2026-03-06T15:26:29.102980300 ---
+TABLE: cart_items
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: quantity | Type: int | Null: NO | Key:  | Default: null
+  Column: product_id | Type: bigint | Null: NO | Key: MUL | Default: null
+  Column: user_id | Type: bigint | Null: NO | Key: MUL | Default: null
+  Column: price_at_time | Type: decimal(38,2) | Null: NO | Key:  | Default: null
+  Column: cart_id | Type: bigint | Null: NO | Key: MUL | Default: null
+TABLE: carts
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: user_id | Type: bigint | Null: NO | Key: UNI | Default: null
+TABLE: categories
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: name | Type: varchar(255) | Null: NO | Key: UNI | Default: null
+TABLE: coupons
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: code | Type: varchar(255) | Null: NO | Key: UNI | Default: null
+  Column: discount_percent | Type: int | Null: NO | Key:  | Default: null
+  Column: expiry_date | Type: datetime(6) | Null: NO | Key:  | Default: null
+  Column: is_active | Type: bit(1) | Null: NO | Key:  | Default: null
+TABLE: order_items
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: price | Type: decimal(38,2) | Null: NO | Key:  | Default: null
+  Column: quantity | Type: int | Null: NO | Key:  | Default: null
+  Column: order_id | Type: bigint | Null: NO | Key: MUL | Default: null
+  Column: product_id | Type: bigint | Null: NO | Key: MUL | Default: null
+TABLE: orders
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: order_date | Type: datetime(6) | Null: NO | Key:  | Default: null
+  Column: status | Type: varchar(255) | Null: NO | Key:  | Default: null
+  Column: total_amount | Type: decimal(38,2) | Null: NO | Key:  | Default: null
+  Column: user_id | Type: bigint | Null: NO | Key: MUL | Default: null
+TABLE: products
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: category | Type: varchar(255) | Null: YES | Key:  | Default: null
+  Column: description | Type: varchar(255) | Null: YES | Key:  | Default: null
+  Column: image_url | Type: varchar(1000) | Null: YES | Key:  | Default: null
+  Column: name | Type: varchar(255) | Null: NO | Key:  | Default: null
+  Column: price | Type: decimal(38,2) | Null: NO | Key:  | Default: null
+  Column: stock_quantity | Type: int | Null: NO | Key:  | Default: 0
+  Column: sub_category_id | Type: bigint | Null: YES | Key: MUL | Default: null
+  Column: created_at | Type: datetime(6) | Null: YES | Key:  | Default: null
+TABLE: sub_categories
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: name | Type: varchar(255) | Null: NO | Key: MUL | Default: null
+  Column: category_id | Type: bigint | Null: NO | Key: MUL | Default: null
+TABLE: user_roles
+  Column: user_id | Type: bigint | Null: NO | Key: MUL | Default: null
+  Column: role | Type: varchar(255) | Null: YES | Key:  | Default: null
+TABLE: users
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: email | Type: varchar(255) | Null: NO | Key: UNI | Default: null
+  Column: loyalty_points | Type: int | Null: NO | Key:  | Default: null
+  Column: membership_level | Type: varchar(255) | Null: NO | Key:  | Default: null
+  Column: name | Type: varchar(255) | Null: NO | Key:  | Default: null
+  Column: password | Type: varchar(255) | Null: NO | Key:  | Default: null
+  Column: profile_image | Type: varchar(255) | Null: YES | Key:  | Default: null
+  Column: wallet_balance | Type: double | Null: YES | Key:  | Default: null
+  Column: created_at | Type: datetime(6) | Null: YES | Key:  | Default: null
+  Column: mobile_number | Type: varchar(255) | Null: YES | Key: UNI | Default: null
+TABLE: wallet_transactions
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: amount | Type: decimal(38,2) | Null: NO | Key:  | Default: null
+  Column: date | Type: datetime(6) | Null: NO | Key:  | Default: null
+  Column: title | Type: varchar(255) | Null: NO | Key:  | Default: null
+  Column: type | Type: varchar(255) | Null: NO | Key:  | Default: null
+  Column: user_id | Type: bigint | Null: NO | Key: MUL | Default: null
+TABLE: wishlist_items
+  Column: id | Type: bigint | Null: NO | Key: PRI | Default: null
+  Column: product_id | Type: bigint | Null: NO | Key: MUL | Default: null
+  Column: user_id | Type: bigint | Null: NO | Key: MUL | Default: null
+--- Triggers ---
+DataSeeder: Could not drop user_id from cart_items: StatementCallback; uncategorized SQLException for SQL [ALTER TABLE cart_items DROP COLUMN user_id]; SQL state [HY000]; error code [1828]; Cannot drop column 'user_id': needed in a foreign key constraint 'FK709eickf3kc0dujx3ub9i7btf'
+
+--- Force Schema Realignment: 2026-03-06T15:29:45.783955700 ---
+Dropped products.category
+Verified products.stock_quantity default
+DataSeeder: Manual schema purge completed.
+DataSeeder: Initialized stock for 0 products.
+
+--- Extreme Schema Reformation: 2026-03-06T15:32:46.064987600 ---
+Dropping cart_items and carts tables...
+Dropping ghost columns from products...
+Re-adding stock_quantity to products...
+DataSeeder: Extreme reformation completed. Hibernate should recreate tables.
+DataSeeder: Initialized stock for 1 products.
+
+--- Manual Schema Reconstruction: 2026-03-06T15:35:30.976673900 ---
+Dropping any remnants...
+Creating carts table...
+Creating cart_items table...
+Final Stock cleanup for products...
+DataSeeder: Schema manually reconstructed.
+
+--- User Role Inspection: 2026-03-06T15:41:15.831971900 ---
+User ID: 3 | Role: ROLE_SUPPORT
+User ID: 3 | Role: ROLE_MARKETING
+User ID: 3 | Role: ROLE_USER
+User ID: 3 | Role: ROLE_INVENTORY
+User ID: 3 | Role: ROLE_ADMIN
+User ID: 3 | Role: ROLE_SHIPPER
+User ID: 4 | Role: ROLE_USER
+User ID: 5 | Role: ROLE_USER
+User ID: 6 | Role: ROLE_USER
+DataSeeder: Migrated 0 roles to include ROLE_ prefix.
+
+--- User Context Inspection: 2026-03-06T15:43:08.963883700 ---
+User: ID=3 | Name=Ratnesh Waghare | Email=ratneshwaghare114@gmail.com
+  Roles: ROLE_SUPPORT, ROLE_MARKETING, ROLE_USER, ROLE_INVENTORY, ROLE_ADMIN, ROLE_SHIPPER
+User: ID=4 | Name=Test User | Email=test@example.com
+  Roles: ROLE_USER
+User: ID=5 | Name=rat  | Email=ratneshwaghare26@gmail.com
+  Roles: ROLE_USER
+User: ID=6 | Name=Tester | Email=test@test.com
+  Roles: ROLE_USER
+
+--- User Context Inspection: 2026-03-06T15:45:01.918641600 ---
+User: ID=3 | Name=Ratnesh Waghare | Email=ratneshwaghare114@gmail.com
+  Roles: ROLE_SUPPORT, ROLE_MARKETING, ROLE_USER, ROLE_INVENTORY, ROLE_ADMIN, ROLE_SHIPPER
+User: ID=4 | Name=Test User | Email=test@example.com
+  Roles: ROLE_USER
+User: ID=5 | Name=rat  | Email=ratneshwaghare26@gmail.com
+  Roles: ROLE_USER
+User: ID=6 | Name=Tester | Email=test@test.com
+  Roles: ROLE_USER
+
+--- User Context Inspection: 2026-03-06T15:46:51.220440400 ---
+User: ID=3 | Name=Ratnesh Waghare | Email=ratneshwaghare114@gmail.com
+  Roles: ROLE_SUPPORT, ROLE_MARKETING, ROLE_USER, ROLE_INVENTORY, ROLE_ADMIN, ROLE_SHIPPER
+User: ID=4 | Name=Test User | Email=test@example.com
+  Roles: ROLE_USER
+User: ID=5 | Name=rat  | Email=ratneshwaghare26@gmail.com
+  Roles: ROLE_USER
+User: ID=6 | Name=Tester | Email=test@test.com
+  Roles: ROLE_USER
+
+--- User Setup & Inspection: 2026-03-06T15:49:12.248168 ---
+DataSeeder: Created admin account.

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Star, Heart, Loader2 } from "lucide-react";
@@ -8,15 +8,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     getAllCategoriesAPI,
     getProductsBySubCategoryAPI,
+    getProductsByCategoryAPI,
     CategoryDTO,
     SubCategoryDTO,
     ProductResponse
 } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
 import { fadeUp, stagger } from "@/lib/animations";
+import { useSearchParams } from "next/navigation";
 
-export default function ShopByCategory() {
+function ShopByCategoryContent() {
     const { addToCart } = useCart();
+    const searchParams = useSearchParams();
+    const categoryIdParam = searchParams.get("id");
 
     const [categories, setCategories] = useState<CategoryDTO[]>([]);
     const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
@@ -35,10 +39,9 @@ export default function ShopByCategory() {
                 setCategories(data);
 
                 if (data.length > 0) {
-                    setActiveCategoryId(data[0].id);
-                    if (data[0].subCategories && data[0].subCategories.length > 0) {
-                        setActiveSubCategoryId(data[0].subCategories[0].id);
-                    }
+                    const idToSelect = categoryIdParam ? parseInt(categoryIdParam) : data[0].id;
+                    setActiveCategoryId(idToSelect);
+                    setActiveSubCategoryId(-1);
                 }
             } catch (err) {
                 const error = err as Error;
@@ -52,7 +55,7 @@ export default function ShopByCategory() {
 
     // Fetch Products whenever the active subcategory changes
     useEffect(() => {
-        if (!activeSubCategoryId) {
+        if (activeSubCategoryId === null || !activeCategoryId) {
             setProducts([]);
             return;
         }
@@ -60,7 +63,15 @@ export default function ShopByCategory() {
         async function fetchProducts() {
             setLoadingProducts(true);
             try {
-                const data = await getProductsBySubCategoryAPI(activeSubCategoryId!);
+                const activeCategory = categories.find(c => c.id === activeCategoryId);
+                if (!activeCategory) return;
+
+                let data: ProductResponse[] = [];
+                if (activeSubCategoryId === -1) {
+                    data = await getProductsByCategoryAPI(activeCategory.name) || [];
+                } else if (activeSubCategoryId !== null) {
+                    data = await getProductsBySubCategoryAPI(activeSubCategoryId) || [];
+                }
                 setProducts(data);
             } catch (err) {
                 console.error("Failed to load products for subcategory:", err);
@@ -69,7 +80,7 @@ export default function ShopByCategory() {
             }
         }
         fetchProducts();
-    }, [activeSubCategoryId]);
+    }, [activeSubCategoryId, activeCategoryId, categories]);
 
     const activeCategory = categories.find(c => c.id === activeCategoryId);
 
@@ -123,11 +134,7 @@ export default function ShopByCategory() {
                                         key={category.id}
                                         onClick={() => {
                                             setActiveCategoryId(category.id);
-                                            if (category.subCategories && category.subCategories.length > 0) {
-                                                setActiveSubCategoryId(category.subCategories[0].id);
-                                            } else {
-                                                setActiveSubCategoryId(null);
-                                            }
+                                            setActiveSubCategoryId(-1);
                                         }}
                                         className={`flex-shrink-0 px-8 py-3 rounded-full text-sm font-black tracking-wide uppercase transition-all duration-300 ${activeCategoryId === category.id
                                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
@@ -143,6 +150,15 @@ export default function ShopByCategory() {
                         {/* SubCategory Pills */}
                         {activeCategory && activeCategory.subCategories && activeCategory.subCategories.length > 0 && (
                             <div className="flex flex-wrap gap-3 pb-4 border-b border-gray-100">
+                                <button
+                                    onClick={() => setActiveSubCategoryId(-1)}
+                                    className={`px-5 py-2 rounded-2xl text-xs font-bold transition-all duration-300 border ${activeSubCategoryId === -1
+                                        ? 'bg-black text-white border-black'
+                                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    All
+                                </button>
                                 {activeCategory.subCategories.map((sub: SubCategoryDTO) => (
                                     <button
                                         key={sub.id}
@@ -274,5 +290,17 @@ export default function ShopByCategory() {
                 )}
             </div>
         </section>
+    );
+}
+
+export default function ShopByCategory() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center p-12">
+                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+            </div>
+        }>
+            <ShopByCategoryContent />
+        </Suspense>
     );
 }

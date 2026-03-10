@@ -8,7 +8,9 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findBySubCategoryCategoryName(String categoryName);
 
-    List<Product> findBySubCategoryId(Long subCategoryId);
+    @org.springframework.data.jpa.repository.Query("SELECT p FROM Product p WHERE p.subCategory.id = :subCategoryId")
+    List<Product> findBySubCategoryId(
+            @org.springframework.data.repository.query.Param("subCategoryId") Long subCategoryId);
 
     List<Product> findTop12ByOrderByCreatedAtDesc();
 }

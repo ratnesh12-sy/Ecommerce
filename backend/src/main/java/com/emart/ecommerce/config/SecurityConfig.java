@@ -55,12 +55,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Stateless APIs typically disable CSRF
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers
-                        .xssProtection(xss -> xss.disable()) // Usually handled by frontend frameworks, disabled here
-                                                             // for modern config
+                        .xssProtection(org.springframework.security.config.Customizer.withDefaults())
                         .contentSecurityPolicy(cps -> cps.policyDirectives(
                                 "default-src 'self'; connect-src 'self' http://localhost:3000 http://localhost:8080; img-src 'self' data: https:;"))
                         .frameOptions(frame -> frame.deny())
-                        .contentTypeOptions(contentType -> contentType.disable()))
+                        .contentTypeOptions(org.springframework.security.config.Customizer.withDefaults()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
